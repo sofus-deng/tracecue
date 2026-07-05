@@ -10,7 +10,7 @@ Every guide card should show its source trail or be marked for review before pub
 
 | ID | Status | Task | Check |
 |---|---|---|---|
-| T001 | todo | Fix current Mantine and TypeScript errors | pnpm typecheck, pnpm build |
+| T001 | done | Fix current Mantine and TypeScript errors | pnpm typecheck, pnpm build |
 | T002 | todo | Make Export ledger JSON download the current ledger and guarded cards | pnpm typecheck, pnpm build, browser check |
 | T003 | todo | Add synthetic markdown sample files under samples | pnpm typecheck, manual review |
 | T004 | todo | Add parser from sample markdown to source documents and source chunks | pnpm typecheck, browser check |
