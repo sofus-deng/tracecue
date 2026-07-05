@@ -23,6 +23,12 @@ Core promise:
 
 > Every generated guide card must either prove where it came from or be blocked / marked for review before publishing.
 
+## Work items
+
+Read `WORK_ITEMS.md` before starting each coding pass.
+
+Complete only the current priority item unless the user explicitly asks for more.
+
 ## Current scope
 
 Build one excellent demo slice:
