@@ -85,6 +85,10 @@ See [`docs/alibaba-cloud-deployment.md`](docs/alibaba-cloud-deployment.md) for p
 
 The recommended hackathon path is to run TraceCue as a standard Next.js Node service on Alibaba Cloud, keep deterministic fallback enabled by default, and enable Qwen live generation only when server-side credentials are configured in the deployment runtime.
 
+## Demo video and screenshots
+
+See [`docs/demo-video-script.md`](docs/demo-video-script.md) for the three-minute demo script, recording plan, screenshot checklist, and Devpost submission reminders.
+
 ## Suggested Codex next task
 
 Ask Codex to follow the current priority in `WORK_ITEMS.md`:
@@ -109,6 +113,7 @@ src/lib/source-samples.ts
 src/lib/types.ts
 samples/
 docs/alibaba-cloud-deployment.md
+docs/demo-video-script.md
 docs/architecture.md
 docs/db-postgres18-plan.md
 ```

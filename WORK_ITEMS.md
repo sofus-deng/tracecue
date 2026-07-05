@@ -17,10 +17,10 @@ Every guide card should show its source trail or be marked for review before pub
 | T005 | done | Add README section for demo data and open-source boundary | manual review |
 | T006 | done | Add Qwen integration behind deterministic fallback | pnpm typecheck, pnpm build |
 | T007 | done | Add Alibaba Cloud deployment notes | manual review |
-| T008 | todo | Add demo video script and screenshot checklist | manual review |
+| T008 | done | Add demo video script and screenshot checklist | manual review |
 | T009 | todo | Polish Devpost-ready README | manual review |
 | T010 | todo | Final validation before submission | pnpm typecheck, pnpm build, browser recording check |
 
 ## Current priority
 
-Do T008 next. Do not start T009 until T008 is complete.
+Do T009 next. Do not start T010 until T009 is complete.
