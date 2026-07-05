@@ -34,6 +34,19 @@ export type GuideCard = {
   reviewStatus: ReviewStatus;
 };
 
+export type GuideGenerationMode =
+  | 'deterministic_fallback'
+  | 'qwen_live'
+  | 'qwen_unconfigured_fallback'
+  | 'qwen_failed_fallback';
+
+export type GuideGenerationMeta = {
+  mode: GuideGenerationMode;
+  model: string;
+  reason: string;
+  generatedAt: string;
+};
+
 export type GuardedGuideCard = GuideCard & {
   riskFlags: RiskFlag[];
   sourceGuardStatus: 'grounded' | 'needs_review';

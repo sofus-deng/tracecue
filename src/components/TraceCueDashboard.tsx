@@ -45,7 +45,13 @@ import {
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 
-import type { GuardedGuideCard, ProcedureLedger, SourceChunk, SourceDocument } from '@/src/lib/types';
+import type {
+  GuardedGuideCard,
+  GuideGenerationMeta,
+  ProcedureLedger,
+  SourceChunk,
+  SourceDocument,
+} from '@/src/lib/types';
 
 const statusColor = {
   publishable: 'green',
@@ -54,22 +60,38 @@ const statusColor = {
 } as const;
 
 type TraceCueDashboardProps = {
+  generationMeta: GuideGenerationMeta;
   guardedCards: GuardedGuideCard[];
   ledger: ProcedureLedger;
   sourceChunks: SourceChunk[];
   sourceDocuments: SourceDocument[];
 };
 
-export function TraceCueDashboard({ guardedCards, ledger, sourceChunks, sourceDocuments }: TraceCueDashboardProps) {
+const generationStatus = {
+  deterministic_fallback: { label: 'Generation: deterministic fallback', color: 'gray' },
+  qwen_live: { label: 'Generation: Qwen live', color: 'green' },
+  qwen_unconfigured_fallback: { label: 'Generation: Qwen unconfigured -> fallback', color: 'yellow' },
+  qwen_failed_fallback: { label: 'Generation: Qwen failed -> fallback', color: 'red' },
+} as const;
+
+export function TraceCueDashboard({
+  generationMeta,
+  guardedCards,
+  ledger,
+  sourceChunks,
+  sourceDocuments,
+}: TraceCueDashboardProps) {
   const [feedback, setFeedback] = useState('Step 5 is unclear. What does a good bug report look like?');
   const publishable = guardedCards.filter((card) => card.publishGateStatus === 'publishable');
   const blocked = guardedCards.filter((card) => card.publishGateStatus === 'blocked');
   const needsReview = guardedCards.filter((card) => card.publishGateStatus === 'needs_review');
+  const currentGenerationStatus = generationStatus[generationMeta.mode];
 
   function exportLedgerJson() {
     const exportPayload = {
       generatedAt: new Date().toISOString(),
       demoName: 'client-handoff',
+      generationMeta,
       procedureLedger: ledger,
       sourceDocuments,
       sourceChunks,
@@ -118,6 +140,11 @@ export function TraceCueDashboard({ guardedCards, ledger, sourceChunks, sourceDo
                 <Badge variant="outline" color="gray" size="lg">
                   TraceCue Agent
                 </Badge>
+                <Tooltip label={`${generationMeta.reason} Model: ${generationMeta.model}`} multiline w={320}>
+                  <Badge variant="light" color={currentGenerationStatus.color} size="lg">
+                    {currentGenerationStatus.label}
+                  </Badge>
+                </Tooltip>
               </Group>
               <Title order={1} fz={{ base: 48, md: 78 }} lh={0.92} style={{ letterSpacing: '-0.065em' }}>
                 Procedure guides that prove where they came from.

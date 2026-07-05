@@ -45,11 +45,11 @@ High-level product language, public-safe architecture notes, synthetic sample da
 ## Current demo scope
 
 - **Client Handoff Guide:** one focused procedure scenario for a small-team client handoff.
-- **Deterministic guide cards:** stable generated cards for a reliable hackathon walkthrough.
+- **Deterministic guide cards:** stable fallback cards for a reliable hackathon walkthrough.
 - **Synthetic markdown samples:** public-safe source documents under `samples/`, parsed into source documents and source chunks.
 - **JSON export:** the dashboard can export `tracecue-ledger-client-handoff-v1.json` with the ProcedureLedger, source trail, guarded cards, and Publish Gate summary.
 
-The current slice intentionally does not include authentication, billing, multi-tenant SaaS behavior, PDF upload, Qwen integration, or database persistence.
+The current slice intentionally does not include authentication, billing, multi-tenant SaaS behavior, PDF upload, or database persistence.
 
 ## Install
 
@@ -71,23 +71,20 @@ http://localhost:3000
 cp runtime.example .env.local
 ```
 
-The current starter uses deterministic data first so the demo always runs. Add Qwen calls after the UI and guardrail flow are stable.
+The demo runs deterministically without API credentials. Qwen live generation is opt-in and only runs when `QWEN_LIVE_GENERATION=true`.
+
+For live generation, configure `QWEN_API_KEY` or `DASHSCOPE_API_KEY`, plus `QWEN_BASE_URL` and `QWEN_MODEL` in `.env.local`. Do not commit local environment files.
+
+Generated cards still pass through Source Guard, Risk Guard, ProcedureLedger, and Publish Gate. If Qwen is disabled, unconfigured, unavailable, or returns invalid cards, TraceCue falls back to the deterministic demo cards.
 
 ## Suggested Codex next task
 
-Ask Codex to keep the existing design direction and add Qwen integration only behind the deterministic fallback:
+Ask Codex to follow the current priority in `WORK_ITEMS.md`:
 
 ```text
-Read AGENTS.md, CODEX.md, WORK_ITEMS.md, README.md, src/lib/types.ts, src/lib/demo-data.ts, src/lib/guards.ts, src/lib/source-parser.ts, src/lib/source-samples.ts, and src/components/TraceCueDashboard.tsx.
+Read AGENTS.md, CODEX.md, WORK_ITEMS.md, and README.md before starting.
 
-Keep the existing Mantine-based dark graphite / warm amber dashboard direction.
-
-Implement the next vertical slice:
-1. Add Qwen integration behind the deterministic fallback.
-2. Keep the current synthetic markdown samples and parser working.
-3. Keep deterministic guide cards available for reliable demo playback.
-4. Do not add a database, authentication, billing, or multi-tenant behavior.
-5. Run pnpm typecheck and pnpm build.
+Complete only the current priority item. Keep additions public-safe and run the requested validation for that item.
 ```
 
 ## Key files
