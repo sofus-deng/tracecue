@@ -2,6 +2,8 @@
 
 Codex should follow AGENTS.md.
 
+This is a public hackathon repository. Keep all additions public-safe. Do not copy internal strategy, private planning notes, customer material, commercial playbooks, or engine-vault content into this repo.
+
 Primary task order:
 
 1. Preserve the Mantine visual direction.
