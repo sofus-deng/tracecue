@@ -76,7 +76,7 @@ export function TraceCueDashboard() {
                   TraceCue Agent
                 </Badge>
               </Group>
-              <Title order={1} fz={{ base: 48, md: 78 }} lh={0.92} tracking="-0.065em">
+              <Title order={1} fz={{ base: 48, md: 78 }} lh={0.92} style={{ letterSpacing: '-0.065em' }}>
                 Procedure guides that prove where they came from.
               </Title>
               <Text c="dimmed" fz={{ base: 'lg', md: 22 }} maw={760}>
@@ -115,7 +115,7 @@ export function TraceCueDashboard() {
           </SimpleGrid>
         </Paper>
 
-        <Grid mt="lg" gutter="lg">
+        <Grid mt="lg">
           <Grid.Col span={{ base: 12, lg: 4 }}>
             <Stack>
               <Card className="trace-glass" radius="24px" p="xl">
