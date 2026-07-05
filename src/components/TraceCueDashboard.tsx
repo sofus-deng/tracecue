@@ -79,7 +79,7 @@ export function TraceCueDashboard() {
         needsReviewStepIds: needsReview.map((card) => card.id),
         blockedStepIds: blocked.map((card) => card.id),
       },
-      revisionProposalText: ledger.revisionProposal,
+      revisionProposal: ledger.revisionProposal,
     };
     const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
       type: 'application/json;charset=utf-8',
