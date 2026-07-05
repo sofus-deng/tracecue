@@ -1,0 +1,19 @@
+packages:
+  - "."
+
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+
+# Hackathon sprint mode:
+# pnpm 11 defaults minimumReleaseAge to 1440 minutes.
+# For this local solo sprint, disable the release-age delay.
+minimumReleaseAge: 0
+minimumReleaseAgeStrict: false
+
+# Treat the local lockfile as trusted during this solo sprint.
+# Before public release / CI hardening, consider removing this.
+trustLockfile: true
+
+# Keep trust policy off for now; we need fast install stability.
+trustPolicy: off
