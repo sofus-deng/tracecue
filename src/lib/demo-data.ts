@@ -1,48 +1,7 @@
-import type { GuideCard, SourceChunk, SourceDocument } from './types';
+import { sourceChunks, sourceDocuments } from './source-samples';
+import type { GuideCard } from './types';
 
-export const sourceDocuments: SourceDocument[] = [
-  {
-    id: 'handoff-notes',
-    title: 'Client handoff notes',
-    kind: 'handoff',
-    excerpt: 'Client can edit homepage text, service descriptions, staff bios, and blog posts from the dashboard. Avoid theme files, DNS records, billing settings, and plugin code unless the studio is contacted.',
-  },
-  {
-    id: 'support-faq',
-    title: 'Support FAQ',
-    kind: 'faq',
-    excerpt: '30-day support covers bug fixes for original project scope. New pages, new features, copywriting changes, SEO campaigns, and major design revisions are not included.',
-  },
-  {
-    id: 'delivery-checklist',
-    title: 'Delivery checklist',
-    kind: 'checklist',
-    excerpt: 'Before handoff, confirm domain, SSL, content editor access, analytics scope, contact form tests, and mobile checks. After handoff, client reviews homepage text and sends launch-blocking issues within five business days.',
-  },
-  {
-    id: 'meeting-transcript',
-    title: 'Meeting transcript excerpt',
-    kind: 'transcript',
-    excerpt: 'Project manager told the client to send exact page URL, screenshot, device, browser, and a short description when reporting issues. Minor copy edits can be quoted separately.',
-  },
-  {
-    id: 'support-policy',
-    title: 'Support policy draft',
-    kind: 'policy',
-    excerpt: 'Covered support includes bug fixes for original scope. Payment disputes follow the signed project agreement and should not be described in a public handoff guide without review.',
-  },
-];
-
-export const sourceChunks: SourceChunk[] = [
-  { id: 'handoff-notes#01', documentId: 'handoff-notes', label: 'Editable content', text: 'Client can edit homepage text blocks, service descriptions, staff bios, and blog posts from the dashboard.' },
-  { id: 'handoff-notes#02', documentId: 'handoff-notes', label: 'Restricted areas', text: 'Client should not edit theme files, billing settings, DNS records, or plugin code without contacting the studio.' },
-  { id: 'handoff-notes#03', documentId: 'handoff-notes', label: 'Image replacement', text: 'Recommended hero image size is 2400 x 1350 pixels. Blog images should be at least 1600 pixels wide.' },
-  { id: 'support-faq#01', documentId: 'support-faq', label: 'Support scope', text: 'The 30-day support window covers bug fixes for work included in the original project scope.' },
-  { id: 'support-faq#02', documentId: 'support-faq', label: 'Out of scope', text: 'New pages, new features, copywriting changes, SEO campaigns, paid ads, and major design revisions are not included.' },
-  { id: 'delivery-checklist#01', documentId: 'delivery-checklist', label: 'Launch checks', text: 'Client should review homepage text, test contact form, upload one test blog draft, and send launch-blocking issues within five business days.' },
-  { id: 'meeting-transcript#01', documentId: 'meeting-transcript', label: 'Bug reports', text: 'Send the exact page URL, screenshot, device, browser, and what happened so the studio can reproduce the issue.' },
-  { id: 'support-policy#01', documentId: 'support-policy', label: 'Agreement risk', text: 'Refunds and payment disputes are handled under the signed project agreement and should not be described in the public handoff guide without review.' },
-];
+export { sourceChunks, sourceDocuments };
 
 export const baseGuideCards: GuideCard[] = [
   {

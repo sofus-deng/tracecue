@@ -12,8 +12,8 @@ Every guide card should show its source trail or be marked for review before pub
 |---|---|---|---|
 | T001 | done | Fix current Mantine and TypeScript errors | pnpm typecheck, pnpm build |
 | T002 | done | Make Export ledger JSON download the current ledger and guarded cards | pnpm typecheck, pnpm build, browser check |
-| T003 | todo | Add synthetic markdown sample files under samples | pnpm typecheck, manual review |
-| T004 | todo | Add parser from sample markdown to source documents and source chunks | pnpm typecheck, browser check |
+| T003 | done | Add synthetic markdown sample files under samples | pnpm typecheck, manual review |
+| T004 | done | Add parser from sample markdown to source documents and source chunks | pnpm typecheck, browser check |
 | T005 | todo | Add README section for demo data and open-source boundary | manual review |
 | T006 | todo | Add Qwen integration behind deterministic fallback | pnpm typecheck, pnpm build |
 | T007 | todo | Add Alibaba Cloud deployment notes | manual review |
@@ -23,4 +23,4 @@ Every guide card should show its source trail or be marked for review before pub
 
 ## Current priority
 
-Do T003 next. Do not start T004 until T003 is complete.
+Do T005 next. Do not start T006 until T005 is complete.

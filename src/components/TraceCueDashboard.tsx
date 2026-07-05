@@ -42,11 +42,10 @@ import {
   IconShieldCheck,
   IconSparkles,
 } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 
-import { baseGuideCards, sourceChunks, sourceDocuments } from '@/src/lib/demo-data';
-import { buildProcedureLedger, guardCards } from '@/src/lib/guards';
+import type { GuardedGuideCard, ProcedureLedger, SourceChunk, SourceDocument } from '@/src/lib/types';
 
 const statusColor = {
   publishable: 'green',
@@ -54,10 +53,15 @@ const statusColor = {
   blocked: 'red',
 } as const;
 
-export function TraceCueDashboard() {
+type TraceCueDashboardProps = {
+  guardedCards: GuardedGuideCard[];
+  ledger: ProcedureLedger;
+  sourceChunks: SourceChunk[];
+  sourceDocuments: SourceDocument[];
+};
+
+export function TraceCueDashboard({ guardedCards, ledger, sourceChunks, sourceDocuments }: TraceCueDashboardProps) {
   const [feedback, setFeedback] = useState('Step 5 is unclear. What does a good bug report look like?');
-  const guardedCards = useMemo(() => guardCards(baseGuideCards), []);
-  const ledger = useMemo(() => buildProcedureLedger(guardedCards), [guardedCards]);
   const publishable = guardedCards.filter((card) => card.publishGateStatus === 'publishable');
   const blocked = guardedCards.filter((card) => card.publishGateStatus === 'blocked');
   const needsReview = guardedCards.filter((card) => card.publishGateStatus === 'needs_review');
