@@ -13,6 +13,7 @@ This starter is optimized for fast local development on macOS with Codex:
 - deterministic demo data
 - ProcedureLedger panel
 - Publish Gate states
+- optional Qwen live generation behind deterministic fallback
 - no database required for the first vertical slice
 
 ## Why this starter avoids a database at P0
@@ -47,7 +48,8 @@ High-level product language, public-safe architecture notes, synthetic sample da
 - **Client Handoff Guide:** one focused procedure scenario for a small-team client handoff.
 - **Deterministic guide cards:** stable fallback cards for a reliable hackathon walkthrough.
 - **Synthetic markdown samples:** public-safe source documents under `samples/`, parsed into source documents and source chunks.
-- **JSON export:** the dashboard can export `tracecue-ledger-client-handoff-v1.json` with the ProcedureLedger, source trail, guarded cards, and Publish Gate summary.
+- **Qwen live generation:** optional server-side generation behind `QWEN_LIVE_GENERATION=true`.
+- **JSON export:** the dashboard can export `tracecue-ledger-client-handoff-v1.json` with the ProcedureLedger, source trail, guarded cards, generation metadata, and Publish Gate summary.
 
 The current slice intentionally does not include authentication, billing, multi-tenant SaaS behavior, PDF upload, or database persistence.
 
@@ -77,6 +79,12 @@ For live generation, configure `QWEN_API_KEY` or `DASHSCOPE_API_KEY`, plus `QWEN
 
 Generated cards still pass through Source Guard, Risk Guard, ProcedureLedger, and Publish Gate. If Qwen is disabled, unconfigured, unavailable, or returns invalid cards, TraceCue falls back to the deterministic demo cards.
 
+## Alibaba Cloud deployment
+
+See [`docs/alibaba-cloud-deployment.md`](docs/alibaba-cloud-deployment.md) for public-safe deployment notes.
+
+The recommended hackathon path is to run TraceCue as a standard Next.js Node service on Alibaba Cloud, keep deterministic fallback enabled by default, and enable Qwen live generation only when server-side credentials are configured in the deployment runtime.
+
 ## Suggested Codex next task
 
 Ask Codex to follow the current priority in `WORK_ITEMS.md`:
@@ -95,10 +103,12 @@ app/page.tsx
 src/components/TraceCueDashboard.tsx
 src/lib/demo-data.ts
 src/lib/guards.ts
+src/lib/qwen.ts
 src/lib/source-parser.ts
 src/lib/source-samples.ts
 src/lib/types.ts
 samples/
+docs/alibaba-cloud-deployment.md
 docs/architecture.md
 docs/db-postgres18-plan.md
 ```
