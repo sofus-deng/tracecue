@@ -11,7 +11,7 @@ Every guide card should show its source trail or be marked for review before pub
 | ID | Status | Task | Check |
 |---|---|---|---|
 | T001 | done | Fix current Mantine and TypeScript errors | pnpm typecheck, pnpm build |
-| T002 | todo | Make Export ledger JSON download the current ledger and guarded cards | pnpm typecheck, pnpm build, browser check |
+| T002 | done | Make Export ledger JSON download the current ledger and guarded cards | pnpm typecheck, pnpm build, browser check |
 | T003 | todo | Add synthetic markdown sample files under samples | pnpm typecheck, manual review |
 | T004 | todo | Add parser from sample markdown to source documents and source chunks | pnpm typecheck, browser check |
 | T005 | todo | Add README section for demo data and open-source boundary | manual review |
@@ -23,4 +23,4 @@ Every guide card should show its source trail or be marked for review before pub
 
 ## Current priority
 
-Do T001 first. Do not start T002 until typecheck and build pass.
+Do T003 next. Do not start T004 until T003 is complete.

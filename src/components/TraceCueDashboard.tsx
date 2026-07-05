@@ -43,6 +43,7 @@ import {
   IconSparkles,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+import { notifications } from '@mantine/notifications';
 
 import { baseGuideCards, sourceChunks, sourceDocuments } from '@/src/lib/demo-data';
 import { buildProcedureLedger, guardCards } from '@/src/lib/guards';
@@ -60,6 +61,44 @@ export function TraceCueDashboard() {
   const publishable = guardedCards.filter((card) => card.publishGateStatus === 'publishable');
   const blocked = guardedCards.filter((card) => card.publishGateStatus === 'blocked');
   const needsReview = guardedCards.filter((card) => card.publishGateStatus === 'needs_review');
+
+  function exportLedgerJson() {
+    const exportPayload = {
+      generatedAt: new Date().toISOString(),
+      demoName: 'client-handoff',
+      procedureLedger: ledger,
+      sourceDocuments,
+      sourceChunks,
+      guardedGuideCards: guardedCards,
+      publishGateSummary: {
+        status: ledger.publishStatus,
+        publishableCount: publishable.length,
+        needsReviewCount: needsReview.length,
+        blockedCount: blocked.length,
+        publishableStepIds: publishable.map((card) => card.id),
+        needsReviewStepIds: needsReview.map((card) => card.id),
+        blockedStepIds: blocked.map((card) => card.id),
+      },
+      revisionProposalText: ledger.revisionProposal,
+    };
+    const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
+      type: 'application/json;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'tracecue-ledger-client-handoff-v1.json';
+    link.click();
+    URL.revokeObjectURL(url);
+
+    notifications.show({
+      title: 'Ledger exported',
+      message: 'Downloaded tracecue-ledger-client-handoff-v1.json',
+      color: 'green',
+      icon: <IconCheck size={16} />,
+    });
+  }
 
   return (
     <Box className="trace-shell" pos="relative">
@@ -87,7 +126,13 @@ export function TraceCueDashboard() {
                 <Button size="md" radius="xl" leftSection={<IconPlayerPlay size={18} />} color="orange">
                   Run demo slice
                 </Button>
-                <Button size="md" radius="xl" variant="default" leftSection={<IconDatabaseExport size={18} />}>
+                <Button
+                  size="md"
+                  radius="xl"
+                  variant="default"
+                  leftSection={<IconDatabaseExport size={18} />}
+                  onClick={exportLedgerJson}
+                >
                   Export ledger JSON
                 </Button>
                 <Kbd>Client Handoff</Kbd>
