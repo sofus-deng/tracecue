@@ -2,6 +2,16 @@
 
 This repository is a local-first starter for building TraceCue Agent with Codex on macOS.
 
+## Public repo boundary
+
+This repository is intended to become open source for the hackathon submission.
+
+Do not add internal strategy, private planning notes, commercial roadmaps, pricing, sales playbooks, customer lists, customer documents, private prompt chains, or engine-vault content to this repository.
+
+All public-facing content must be synthetic, generic, and safe for external reviewers to inspect.
+
+High-level product language is allowed. Internal WorkCue strategy is not.
+
 ## Product focus
 
 TraceCue should win attention with two excellent capabilities, not many weak features:
