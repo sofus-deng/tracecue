@@ -19,8 +19,10 @@ Every guide card should show its source trail or be marked for review before pub
 | T007 | done | Add Alibaba Cloud deployment notes | manual review |
 | T008 | done | Add demo video script and screenshot checklist | manual review |
 | T009 | done | Polish Devpost-ready README | manual review |
-| T010 | todo | Final validation before submission | pnpm typecheck, pnpm build, browser recording check |
+| T010 | done | Final validation before submission | pnpm typecheck, pnpm build, browser recording check |
 
 ## Current priority
 
-Do T010 next.
+Submission materials are ready for final external review.
+
+Alibaba Cloud deployment proof video / URL remains an external submission artifact before Devpost submission.
