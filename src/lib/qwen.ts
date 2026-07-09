@@ -115,12 +115,16 @@ function buildPrompt(sourceDocuments: SourceDocument[], sourceChunks: SourceChun
     .join('\n');
 
   return [
-    'Task: Generate a concise Equipment After-sales QR Guide for a public-safe synthetic demo.',
-    'Return JSON only. No markdown. No prose outside JSON.',
-    'Return exactly 4 cards. Each card should have 1-2 short frontline instructions for equipment after-sales service.',
-    'Use only the provided source chunks. Do not invent facts, policies, dates, names, prices, warranty approvals, repairs, or commitments.',
+    'Task: Generate a concise, mobile-friendly Equipment After-sales QR Guide from this public-safe synthetic source pack.',
+    'Return one strict JSON object only. No markdown, comments, or prose outside JSON.',
+    'Return exactly 4 cards in the cards array. Use only these fields per card: title, purpose, instructions, completionCheck, sourceRefs, reviewStatus.',
+    'Card writing rules: title under 8 words; purpose one short sentence; instructions must be 1-2 short imperative steps; completionCheck one short observable check.',
+    'Guide coverage targets: safe inspection or cleaning; filter replacement or reset; fault triage or escalation; service boundary or warranty boundary.',
+    'Use reviewStatus "approved" only for routine grounded steps. Use "pending" for escalation, stop-use, service-boundary, or warranty-sensitive steps.',
+    'Use only the provided source chunks. Do not invent facts, policies, dates, names, prices, warranty approvals, repair authority, safety certifications, or customer commitments.',
+    'Do not instruct unsupported repair, electrical work, sealed housing access, motor repair, sensor repair, bypassing safeguards, or warranty approval. Route those cases to stop-use or qualified support when supported by sources.',
     `Allowed sourceRefs: ${JSON.stringify(allowedSourceRefs)}`,
-    'Every card must include one or more sourceRefs copied exactly from the allowed sourceRefs list.',
+    'Every card must include 1-3 sourceRefs copied exactly from the allowed sourceRefs list. Do not use document IDs without chunk numbers.',
     'Allowed reviewStatus values: pending, approved, edited, rejected.',
     'Required JSON shape: {"cards":[{"title":"...","purpose":"...","instructions":["..."],"completionCheck":"...","sourceRefs":["filter-replacement#01"],"reviewStatus":"approved"}]}',
     `Source documents: ${sourceTitles}`,
