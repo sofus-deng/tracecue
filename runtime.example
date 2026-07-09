@@ -2,6 +2,8 @@ QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
 QWEN_MODEL_CHAIN=qwen3.7-max,qwen3.7-plus,qwen3.6-plus,qwen3.6-flash,qwen3.5-plus,qwen3.5-flash
+# Set true only when explicit live Qwen runs are allowed from the Run Qwen pass action.
 QWEN_LIVE_GENERATION=false
+# Keep false by default so homepage loads use deterministic standby instead of automatic model calls.
 QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent

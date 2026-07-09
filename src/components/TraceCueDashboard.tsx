@@ -104,31 +104,49 @@ type TraceCueDashboardProps = {
 type RunDemoResponse = TraceCueDashboardProps;
 
 const generationStatus = {
-  deterministic_fallback: { label: 'Deterministic standby', color: 'gray' },
-  qwen_live: { label: 'Qwen live', color: 'teal' },
-  qwen_unconfigured_fallback: { label: 'Qwen unconfigured', color: 'yellow' },
-  qwen_failed_fallback: { label: 'Qwen fallback', color: 'red' },
-  qwen_quota_paused: { label: 'Paused - no free quota', color: 'red' },
+  deterministic_fallback: {
+    label: 'Deterministic standby',
+    color: 'gray',
+    description: 'Demo cards loaded without a live model call.',
+    notificationTitle: 'Deterministic standby loaded',
+    notificationColor: 'gray',
+  },
+  qwen_live: {
+    label: 'Qwen live',
+    color: 'teal',
+    description: 'Guide cards came from an explicit Qwen pass.',
+    notificationTitle: 'Qwen live generation succeeded',
+    notificationColor: 'green',
+  },
+  qwen_unconfigured_fallback: {
+    label: 'Qwen unconfigured',
+    color: 'yellow',
+    description: 'Live generation is enabled, but server credentials are missing; deterministic cards are shown.',
+    notificationTitle: 'Qwen unconfigured; fallback shown',
+    notificationColor: 'yellow',
+  },
+  qwen_failed_fallback: {
+    label: 'Qwen attempted; fallback used',
+    color: 'orange',
+    description: 'Qwen was attempted, but deterministic fallback was used.',
+    notificationTitle: 'Qwen attempted; fallback used',
+    notificationColor: 'orange',
+  },
+  qwen_quota_paused: {
+    label: 'Free quota exhausted',
+    color: 'red',
+    description: 'All configured free-tier models are exhausted; live generation is paused to avoid billable usage.',
+    notificationTitle: 'Free quota exhausted; live generation paused',
+    notificationColor: 'red',
+  },
 } as const;
 
 function notificationTone(mode: GuideGenerationMeta['mode']) {
-  if (mode === 'qwen_live') {
-    return {
-      title: 'Qwen live generation succeeded',
-      color: 'green',
-    } as const;
-  }
-
-  if (mode === 'qwen_quota_paused') {
-    return {
-      title: 'Live generation paused',
-      color: 'red',
-    } as const;
-  }
+  const status = generationStatus[mode];
 
   return {
-    title: 'Demo run completed with fallback',
-    color: 'yellow',
+    title: status.notificationTitle,
+    color: status.notificationColor,
   } as const;
 }
 
@@ -371,7 +389,11 @@ export function TraceCueDashboard({
                 <Badge variant="outline" color="dark" size="lg">
                   TraceCue Agent
                 </Badge>
-                <Tooltip label={`${currentGenerationMeta.reason} Model: ${currentGenerationMeta.model}`} multiline w={360}>
+                <Tooltip
+                  label={`${currentGenerationStatus.description} Mode: ${currentGenerationMeta.mode}. Model: ${currentGenerationMeta.model}. Reason: ${currentGenerationMeta.reason}`}
+                  multiline
+                  w={420}
+                >
                   <Badge variant="light" color={currentGenerationStatus.color} size="lg">
                     {currentGenerationStatus.label}
                   </Badge>
@@ -456,8 +478,8 @@ export function TraceCueDashboard({
             </Grid>
 
             {currentGenerationMeta.mode === 'qwen_quota_paused' ? (
-              <Alert color="red" radius="md" title="Live generation paused">
-                {currentGenerationMeta.reason}
+              <Alert color="red" radius="md" title="Free quota exhausted; live generation paused">
+                TraceCue paused live Qwen generation to avoid billable usage. {currentGenerationMeta.reason}
               </Alert>
             ) : null}
 
@@ -514,6 +536,11 @@ export function TraceCueDashboard({
                   </ThemeIcon>
                 </Group>
                 <Timeline color="teal" active={4} bulletSize={24} lineWidth={2} mt="md">
+                  <Timeline.Item bullet={<IconSparkles size={13} />} title="Generation state">
+                    <Text size="sm" c="dimmed">
+                      {currentGenerationStatus.label}. {currentGenerationStatus.description} Model: {currentGenerationMeta.model}.
+                    </Text>
+                  </Timeline.Item>
                   <Timeline.Item bullet={<IconFileText size={13} />} title="Source snapshot">
                     <Text size="sm" c="dimmed">{sourceChunks.length} chunks captured from synthetic inputs.</Text>
                   </Timeline.Item>
@@ -812,7 +839,7 @@ export function TraceCueDashboard({
                                   <Text size="xs" c="dimmed">Model: {currentGenerationMeta.model}</Text>
                                 </Stack>
                                 <Badge color={currentGenerationStatus.color} variant="light">
-                                  {currentGenerationMeta.mode.replaceAll('_', ' ')}
+                                  {currentGenerationStatus.label}
                                 </Badge>
                               </Group>
                             </Paper>

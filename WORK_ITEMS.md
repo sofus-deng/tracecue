@@ -39,7 +39,7 @@ Core promise:
 | NT006 | done | P0 | Add QR guide preview | UI shows a mobile-style guide preview that could be reached from a QR code |
 | NT007 | done | P0 | Add explicit review actions | Cards support approved, needs expert review, and blocked states in the UI |
 | NT008 | done | P1 | Add exportable guide artifact | Export Markdown or HTML guide in addition to ProcedureLedger JSON |
-| NT009 | todo | P1 | Improve quota-state messaging | UI clearly distinguishes Qwen live, fallback, unconfigured, failed, and quota paused states |
+| NT009 | done | P1 | Improve quota-state messaging | UI clearly distinguishes Qwen live, fallback, unconfigured, failed, and quota paused states |
 | NT010 | todo | P1 | Add visual QA checklist | README or docs include desktop/mobile screenshots to capture before submission |
 | NT011 | todo | P1 | Update public README for new TraceCue | README explains WorkCue Open, new after-sales scenario, Qwen model chain, cost guard, and deployment proof |
 | NT012 | todo | P1 | Final new TraceCue validation | `pnpm typecheck`, `pnpm build`, `pnpm lint`, browser check, export check, Qwen manual-run check |

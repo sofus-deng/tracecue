@@ -261,7 +261,7 @@ export async function resolveGuideCardsWithFallback({
       deterministicCards,
       'deterministic_fallback',
       primaryModel,
-      'Qwen live generation is disabled; using deterministic demo cards.',
+      'Qwen live generation is disabled by runtime config. TraceCue loaded deterministic demo cards without a live model call.',
     );
   }
 
@@ -270,7 +270,7 @@ export async function resolveGuideCardsWithFallback({
       deterministicCards,
       'deterministic_fallback',
       primaryModel,
-      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Use Run Qwen pass for an explicit one-time live generation request.',
+      'Page load is using deterministic demo cards because automatic Qwen calls are disabled. Use Run Qwen pass for an explicit one-time live generation request.',
     );
   }
 
@@ -281,7 +281,7 @@ export async function resolveGuideCardsWithFallback({
       deterministicCards,
       'qwen_unconfigured_fallback',
       primaryModel,
-      'Qwen live generation is enabled but no server-side API key is configured.',
+      'Qwen live generation is enabled, but no server-side API key is configured. Deterministic demo cards are shown.',
     );
   }
 
@@ -306,7 +306,12 @@ export async function resolveGuideCardsWithFallback({
 
       const reason = error instanceof Error ? error.message : 'Qwen generation failed for an unknown reason.';
 
-      return deterministicFallback(deterministicCards, 'qwen_failed_fallback', model, reason);
+      return deterministicFallback(
+        deterministicCards,
+        'qwen_failed_fallback',
+        model,
+        `Qwen was attempted, but the request failed or returned unusable output. Deterministic demo cards are shown. Details: ${reason}`,
+      );
     }
   }
 
@@ -314,6 +319,6 @@ export async function resolveGuideCardsWithFallback({
     deterministicCards,
     'qwen_quota_paused',
     config.modelChain.join(' > '),
-    `暫停運作：configured Qwen free-tier quota is exhausted for all models in order: ${config.modelChain.join(' > ')}.`,
+    `All configured Qwen free-tier models are exhausted. TraceCue paused live generation to avoid billable usage. Models checked: ${config.modelChain.join(' > ')}.`,
   );
 }
