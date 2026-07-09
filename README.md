@@ -17,7 +17,7 @@ Why this track fits:
 - TraceCue automates a real business workflow: turning scattered procedure evidence into publishable operating guidance.
 - It handles ambiguous source material through review-required and blocked states.
 - It keeps a human-in-the-loop checkpoint before risky or unsupported instructions can ship.
-- It uses Qwen live generation only behind a deterministic fallback so the demo stays stable and inspectable.
+- It can use Qwen live generation in a controlled demo while retaining deterministic fallback as a safety path.
 
 ## Problem
 
@@ -39,7 +39,7 @@ The current demo creates a **Client Handoff Guide** from synthetic source docume
 It demonstrates:
 
 - **Synthetic source parsing** — markdown samples become source documents and source chunks.
-- **Guide card generation** — deterministic fallback cards keep the demo replayable; Qwen live generation can be enabled server-side.
+- **Guide card generation** — deterministic fallback cards keep the demo replayable; Qwen live generation can be enabled server-side for controlled demos.
 - **Source trail** — each guide card carries source references such as `handoff-notes#01` or `meeting-transcript#01`.
 - **Source Guard** — cards with missing evidence are marked for review.
 - **Risk Guard** — risky language around payment, support, access, or agreement-sensitive content is flagged.
@@ -57,7 +57,7 @@ flowchart LR
   C --> E[Guide card resolver]
   D --> E
   E -->|Default| F[Deterministic fallback cards]
-  E -->|Optional server-side call| G[Qwen live generation]
+  E -->|Controlled opt-in| G[Qwen live generation]
   F --> H[Source Guard]
   G --> H
   H --> I[Risk Guard]
@@ -67,7 +67,7 @@ flowchart LR
   K --> M[Ledger JSON export]
 ```
 
-Qwen generation is intentionally isolated behind the resolver. If Qwen is disabled, unconfigured, unavailable, or returns invalid output, TraceCue falls back to deterministic cards and still runs the guardrail pipeline.
+Qwen generation is intentionally isolated behind the resolver. If Qwen is disabled, unconfigured, unavailable, returns invalid output, or page-load live generation is not explicitly allowed, TraceCue falls back to deterministic cards and still runs the guardrail pipeline.
 
 ## Qwen Cloud usage
 
@@ -77,18 +77,26 @@ Default runtime behavior:
 
 ```text
 QWEN_LIVE_GENERATION=false
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 ```
 
-This keeps the public demo stable when judges clone the repo without credentials.
+This keeps the public demo stable when judges clone the repo without credentials and prevents passive homepage requests from creating model usage.
 
-To test live Qwen generation, configure server-side environment variables:
+To test live Qwen generation on the current homepage SSR path, configure server-side environment variables only during a controlled demo:
 
 ```env
 QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen-plus
+QWEN_MODEL=qwen3.7-plus
 QWEN_LIVE_GENERATION=true
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true
+```
+
+After the controlled demo, set:
+
+```env
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 ```
 
 Rules:
@@ -96,6 +104,7 @@ Rules:
 - Prefer `QWEN_API_KEY`; `DASHSCOPE_API_KEY` is supported as a fallback.
 - Do not expose model credentials through `NEXT_PUBLIC_*` variables.
 - Do not commit `.env.local` or deployment secrets.
+- Keep `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` unless intentionally testing live generation on homepage render.
 - Qwen-generated cards must include valid `sourceRefs`; invalid cards fall back to deterministic cards.
 - All cards still pass through Source Guard, Risk Guard, ProcedureLedger, and Publish Gate.
 
@@ -106,7 +115,7 @@ Included:
 - One focused scenario: **Client Handoff Guide**.
 - Synthetic markdown samples under `samples/`.
 - Deterministic fallback guide cards.
-- Optional Qwen live generation.
+- Optional Qwen live generation for controlled demos.
 - Source Guard and Risk Guard.
 - ProcedureLedger.
 - Publish Gate.
@@ -133,7 +142,7 @@ Recommended three-minute walkthrough:
 3. Show guide cards with source references.
 4. Open the Publish Gate and explain publishable / needs review / blocked states.
 5. Show the ProcedureLedger.
-6. Explain Qwen live generation behind deterministic fallback.
+6. Explain Qwen live generation as a controlled opt-in path with deterministic fallback as the safety path.
 7. Export the ledger JSON.
 
 See [`docs/demo-video-script.md`](docs/demo-video-script.md) for the full script and screenshot checklist.
@@ -176,8 +185,9 @@ Default public-safe config:
 QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen-plus
+QWEN_MODEL=qwen3.7-plus
 QWEN_LIVE_GENERATION=false
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent
 ```
 
@@ -185,13 +195,13 @@ With the default config, TraceCue runs deterministic fallback cards and does not
 
 ## Alibaba Cloud deployment
 
-See [`docs/alibaba-cloud-deployment.md`](docs/alibaba-cloud-deployment.md) for deployment notes, runtime variables, and smoke checks.
+See [`docs/alibaba-cloud-deployment.md`](docs/alibaba-cloud-deployment.md) for deployment notes, runtime variables, cost guard, and smoke checks.
 
 Recommended hackathon deployment path:
 
 - Run TraceCue as a standard Next.js Node service on Alibaba Cloud.
 - Keep deterministic fallback enabled by default.
-- Enable Qwen live generation only when server-side credentials are configured in the deployment runtime.
+- Enable Qwen live generation only for controlled demos with server-side credentials configured in the deployment runtime.
 - Verify that no API key appears in the page source, browser console, exported JSON, README, or docs.
 
 ## Public repo boundary
@@ -224,7 +234,7 @@ src/components/
 src/lib/
   demo-data.ts                      # Deterministic fallback guide cards
   guards.ts                         # Source Guard, Risk Guard, ProcedureLedger helpers
-  qwen.ts                           # Server-side Qwen adapter with deterministic fallback
+  qwen.ts                           # Server-side Qwen adapter with deterministic fallback and page-load cost guard
   source-parser.ts                  # Markdown source parser
   source-samples.ts                 # Synthetic sample loader
   types.ts                          # Shared TypeScript types
