@@ -37,9 +37,11 @@ import {
   IconGitBranch,
   IconLockCheck,
   IconPlayerPlay,
+  IconQrcode,
   IconRoute,
   IconShieldCheck,
   IconSparkles,
+  IconUpload,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
@@ -112,6 +114,7 @@ export function TraceCueDashboard({
   const publishable = currentGuardedCards.filter((card) => card.publishGateStatus === 'publishable');
   const blocked = currentGuardedCards.filter((card) => card.publishGateStatus === 'blocked');
   const needsReview = currentGuardedCards.filter((card) => card.publishGateStatus === 'needs_review');
+  const withheldFromPreview = [...needsReview, ...blocked];
   const currentGenerationStatus = generationStatus[currentGenerationMeta.mode];
 
   async function runDemoSlice() {
@@ -367,6 +370,7 @@ export function TraceCueDashboard({
               <Tabs.List>
                 <Tabs.Tab value="cards" leftSection={<IconShieldCheck size={16} />}>Guide cards</Tabs.Tab>
                 <Tabs.Tab value="publish" leftSection={<IconLockCheck size={16} />}>Publish Gate</Tabs.Tab>
+                <Tabs.Tab value="qr-preview" leftSection={<IconQrcode size={16} />}>QR Preview</Tabs.Tab>
                 <Tabs.Tab value="revision" leftSection={<IconSparkles size={16} />}>Revision</Tabs.Tab>
               </Tabs.List>
 
@@ -452,6 +456,185 @@ export function TraceCueDashboard({
                 </Card>
               </Tabs.Panel>
 
+              <Tabs.Panel value="qr-preview" pt="md">
+                <Card className="trace-glass" radius="md" p="md">
+                  <Stack gap="md">
+                    <Group justify="space-between" align="start">
+                      <Stack gap={4}>
+                        <Text className="trace-kicker" fz="xs" fw={800}>QR guide workbench</Text>
+                        <Title order={2} fz="xl">Frontline mobile preview</Title>
+                        <Text c="dimmed" maw={720} size="sm">
+                          This preview shows the guide a frontline user could open after scanning a QR code. It is derived from the current guarded cards and ProcedureLedger state.
+                        </Text>
+                      </Stack>
+                      <ThemeIcon radius="md" variant="filled" color="dark" size="lg">
+                        <IconQrcode size={20} />
+                      </ThemeIcon>
+                    </Group>
+
+                    <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+                      <Paper className="trace-subtle-panel" radius="md" p="md">
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Included in QR guide</Text>
+                        <Text fz={30} fw={850}>{publishable.length}</Text>
+                        <Text size="sm" c="dimmed">Publishable, reviewed steps shown to frontline users.</Text>
+                      </Paper>
+                      <Paper className="trace-subtle-panel" radius="md" p="md">
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Held for review</Text>
+                        <Text fz={30} fw={850}>{needsReview.length}</Text>
+                        <Text size="sm" c="dimmed">Review-only steps stay out of the mobile guide.</Text>
+                      </Paper>
+                      <Paper className="trace-subtle-panel" radius="md" p="md">
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Blocked from QR</Text>
+                        <Text fz={30} fw={850}>{blocked.length}</Text>
+                        <Text size="sm" c="dimmed">Unsupported or ungrounded instructions are withheld.</Text>
+                      </Paper>
+                    </SimpleGrid>
+
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
+                      <Stack gap="md">
+                        <Paper className="trace-subtle-panel" radius="md" p="md">
+                          <Group justify="space-between" align="start">
+                            <Stack gap={4}>
+                              <Text size="xs" c="dimmed" tt="uppercase" fw={800}>QR entry point</Text>
+                              <Title order={3} fz="lg">Equipment guide link</Title>
+                              <Text size="sm" c="dimmed">
+                                Placeholder only: QR rendering and image decoding are planned follow-up work, not part of this UI slice.
+                              </Text>
+                            </Stack>
+                            <QrPlaceholder />
+                          </Group>
+                          <Button
+                            mt="md"
+                            fullWidth
+                            variant="default"
+                            radius="md"
+                            leftSection={<IconUpload size={16} />}
+                            disabled
+                          >
+                            Upload QR image — planned follow-up
+                          </Button>
+                        </Paper>
+
+                        <Paper className="trace-subtle-panel" radius="md" p="md">
+                          <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Withheld notice</Text>
+                          <Title order={3} fz="lg" mt={4}>Review gate protects the QR guide.</Title>
+                          <Text size="sm" c="dimmed" mt="xs">
+                            {withheldFromPreview.length === 0
+                              ? 'No cards are currently withheld. The preview includes every guarded guide card.'
+                              : `${withheldFromPreview.length} card${withheldFromPreview.length === 1 ? '' : 's'} are withheld until review clears them for frontline use.`}
+                          </Text>
+                          {withheldFromPreview.length > 0 ? (
+                            <Stack gap="xs" mt="md">
+                              {withheldFromPreview.map((card) => (
+                                <Group key={card.id} justify="space-between" gap="sm" wrap="nowrap">
+                                  <Text size="sm" lineClamp={1}>{card.title}</Text>
+                                  <Badge color={statusColor[card.publishGateStatus]} variant="light">
+                                    {card.publishGateStatus.replace('_', ' ')}
+                                  </Badge>
+                                </Group>
+                              ))}
+                            </Stack>
+                          ) : null}
+                        </Paper>
+                      </Stack>
+
+                      <Paper radius={32} p="sm" bg="dark" shadow="xl" maw={390} w="100%" mx="auto">
+                        <Paper radius={26} p="md" bg="white" mih={680}>
+                          <Stack gap="md">
+                            <Group justify="space-between" align="start">
+                              <Stack gap={2}>
+                                <Text size="xs" c="dimmed" tt="uppercase" fw={800}>TraceCue QR Guide</Text>
+                                <Title order={3} fz="lg">Equipment after-sales guide</Title>
+                                <Text size="xs" c="dimmed">{currentLedger.guideId} · {currentLedger.version}</Text>
+                              </Stack>
+                              <Badge color={currentLedger.publishStatus === 'approved' ? 'green' : 'yellow'} variant="filled">
+                                {currentLedger.publishStatus}
+                              </Badge>
+                            </Group>
+
+                            <Alert
+                              color={blocked.length > 0 ? 'red' : needsReview.length > 0 ? 'yellow' : 'green'}
+                              radius="md"
+                              title={withheldFromPreview.length > 0 ? 'Some steps are hidden from this QR guide' : 'All steps are cleared for preview'}
+                            >
+                              {withheldFromPreview.length > 0
+                                ? `${needsReview.length} need review and ${blocked.length} are blocked before frontline release.`
+                                : 'No guarded cards are currently withheld by the publish gate.'}
+                            </Alert>
+
+                            <Group grow gap="xs">
+                              <Paper p="xs" radius="md" withBorder>
+                                <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Coverage</Text>
+                                <Text fw={850}>{currentLedger.sourceCoverage}%</Text>
+                              </Paper>
+                              <Paper p="xs" radius="md" withBorder>
+                                <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Mode</Text>
+                                <Text fw={850} size="sm" lineClamp={1}>{currentGenerationStatus.label}</Text>
+                              </Paper>
+                            </Group>
+
+                            <Divider />
+
+                            <ScrollArea h={390} offsetScrollbars>
+                              <Stack gap="sm" pr="xs">
+                                {publishable.length > 0 ? publishable.map((card) => (
+                                  <Paper key={card.id} p="sm" radius="md" withBorder>
+                                    <Stack gap="xs">
+                                      <Group gap="xs" align="start" wrap="nowrap">
+                                        <Badge className="trace-card-index" variant="filled">{String(card.order).padStart(2, '0')}</Badge>
+                                        <Stack gap={2}>
+                                          <Text fw={800} size="sm">{card.title}</Text>
+                                          <Text c="dimmed" size="xs">{card.purpose}</Text>
+                                        </Stack>
+                                      </Group>
+                                      <Stack gap={6}>
+                                        {card.instructions.map((item) => (
+                                          <Group key={item} gap="xs" align="start" wrap="nowrap">
+                                            <ThemeIcon size="xs" radius="md" color="teal" variant="light"><IconCheck size={10} /></ThemeIcon>
+                                            <Text size="xs">{item}</Text>
+                                          </Group>
+                                        ))}
+                                      </Stack>
+                                      <Paper p="xs" radius="md" bg="gray.0">
+                                        <Text size="xs" fw={700}>Completion check</Text>
+                                        <Text size="xs" c="dimmed">{card.completionCheck}</Text>
+                                      </Paper>
+                                      <Group gap={4}>
+                                        {card.sourceRefs.map((ref) => (
+                                          <Badge key={ref} className="trace-source-pill" variant="outline" size="xs">
+                                            {ref}
+                                          </Badge>
+                                        ))}
+                                      </Group>
+                                    </Stack>
+                                  </Paper>
+                                )) : (
+                                  <Alert color="red" radius="md" title="No publishable steps">
+                                    The publish gate is withholding every card, so the frontline QR guide has no actionable instructions yet.
+                                  </Alert>
+                                )}
+                              </Stack>
+                            </ScrollArea>
+
+                            <Paper p="sm" radius="md" bg="gray.0">
+                              <Group justify="space-between" gap="xs">
+                                <Stack gap={0}>
+                                  <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Proof trail</Text>
+                                  <Text size="xs" c="dimmed">Model: {currentGenerationMeta.model}</Text>
+                                </Stack>
+                                <Badge color={currentGenerationStatus.color} variant="light">
+                                  {currentGenerationMeta.mode.replaceAll('_', ' ')}
+                                </Badge>
+                              </Group>
+                            </Paper>
+                          </Stack>
+                        </Paper>
+                      </Paper>
+                    </SimpleGrid>
+                  </Stack>
+                </Card>
+              </Tabs.Panel>
+
               <Tabs.Panel value="revision" pt="md">
                 <Card className="trace-glass" radius="md" p="md">
                   <Text className="trace-kicker" fz="xs" fw={800}>Feedback to v1.1</Text>
@@ -483,6 +666,20 @@ export function TraceCueDashboard({
         </Grid>
       </Container>
     </Box>
+  );
+}
+
+function QrPlaceholder() {
+  const cells = [1, 2, 3, 5, 8, 10, 11, 13, 16, 17, 19, 21, 22, 24, 27, 30];
+
+  return (
+    <Paper p={6} radius="md" bg="white" withBorder aria-label="QR code placeholder">
+      <SimpleGrid cols={6} spacing={2} w={78}>
+        {Array.from({ length: 36 }, (_, index) => (
+          <Box key={index} h={10} bg={cells.includes(index) ? 'dark' : 'gray.1'} />
+        ))}
+      </SimpleGrid>
+    </Paper>
   );
 }
 
