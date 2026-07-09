@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 import type { GuideCard, GuideGenerationMeta, ReviewStatus, SourceChunk, SourceDocument } from './types';
 
-const DEFAULT_MODEL = 'qwen-plus';
+const DEFAULT_MODEL = 'qwen3.7-plus';
 const DEFAULT_BASE_URL = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
-const REQUEST_TIMEOUT_MS = 12_000;
+const REQUEST_TIMEOUT_MS = 45_000;
 
 const reviewStatuses = ['pending', 'approved', 'edited', 'rejected'] as const satisfies readonly ReviewStatus[];
 
@@ -216,6 +216,15 @@ export async function resolveGuideCardsWithFallback({
       'deterministic_fallback',
       model,
       'Qwen live generation is disabled; using deterministic demo cards.',
+    );
+  }
+
+  if (process.env.QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION !== 'true') {
+    return deterministicFallback(
+      deterministicCards,
+      'deterministic_fallback',
+      model,
+      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Set QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true only during controlled demos.',
     );
   }
 
