@@ -33,6 +33,24 @@ QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 
 Future production behavior should add authentication, rate limiting, and per-run cost controls around the explicit API route.
 
+## Free quota model chain
+
+TraceCue can rotate through a free-quota model chain. When Qwen returns a 403 response containing `AllocationQuota.FreeTierOnly`, TraceCue treats that model as exhausted and tries the next configured model.
+
+Default order:
+
+```text
+qwen3.7-max > qwen3.7-plus > qwen3.6-plus > qwen3.6-flash > qwen3.5-plus > qwen3.5-flash
+```
+
+If every configured model is exhausted, the dashboard displays:
+
+```text
+Generation: paused - no free quota
+```
+
+That paused state is intentionally different from deterministic fallback. It means live generation should stop until quota is available again or the operator changes the model chain.
+
 ## Live generation timing
 
 The Qwen request is intentionally bounded so a demo cannot hang forever:
@@ -63,6 +81,7 @@ The deployed app must support:
 - Server-side rendering for the homepage.
 - A POST `/api/run-demo` route for explicit Qwen live generation.
 - Outbound HTTPS calls to Alibaba Cloud Model Studio / DashScope only when Qwen live generation is explicitly triggered.
+- Free-quota model-chain rotation when a model returns `AllocationQuota.FreeTierOnly`.
 - Static access to the synthetic markdown samples bundled in the repo.
 - JSON export from the browser.
 - No database dependency.
@@ -94,7 +113,7 @@ Configure these in the Alibaba Cloud runtime environment or ECS `.env.local`, no
 QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen3.7-plus
+QWEN_MODEL_CHAIN=qwen3.7-max,qwen3.7-plus,qwen3.6-plus,qwen3.6-flash,qwen3.5-plus,qwen3.5-flash
 QWEN_LIVE_GENERATION=true
 QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent
@@ -108,6 +127,7 @@ Rules:
 - Do not commit `.env.local` or any deployment secret.
 - Keep `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` unless intentionally testing live generation on homepage render.
 - Use the `Run demo slice` button for explicit one-time live generation.
+- Use `QWEN_MODEL_CHAIN` to override the default free-quota rotation order.
 
 ## Qwen endpoint notes
 
@@ -119,10 +139,10 @@ The default base URL remains:
 https://dashscope-intl.aliyuncs.com/compatible-mode/v1
 ```
 
-The default model is:
+The default model chain is:
 
 ```text
-qwen3.7-plus
+qwen3.7-max,qwen3.7-plus,qwen3.6-plus,qwen3.6-flash,qwen3.5-plus,qwen3.5-flash
 ```
 
 If the deployment uses a workspace-specific Model Studio endpoint, set `QWEN_BASE_URL` in the runtime environment instead of changing source code.
@@ -135,7 +155,7 @@ After deployment, verify:
 2. Confirm the generation badge says `Generation: deterministic fallback` on initial load.
 3. Confirm source chunks, ProcedureLedger, guide cards, and Publish Gate sections render.
 4. Click `Run demo slice` once.
-5. Confirm the button shows a loading state, then the generation badge updates to either `Generation: Qwen live` or a safe fallback state with the reason in the tooltip.
+5. Confirm the button shows a loading state, then the generation badge updates to `Generation: Qwen live`, a safe fallback state, or `Generation: paused - no free quota` if all configured free quotas are exhausted.
 6. Click `Export ledger JSON`.
 7. Confirm the exported JSON includes `generationMeta`, `procedureLedger`, `sourceDocuments`, `sourceChunks`, `guardedGuideCards`, and `publishGateSummary`.
 8. Confirm no API key appears in the page source, browser console, exported JSON, README, or docs.
