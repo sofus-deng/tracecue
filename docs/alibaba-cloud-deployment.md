@@ -33,6 +33,17 @@ QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 
 Future production behavior should add authentication, rate limiting, and per-run cost controls around the explicit API route.
 
+## Live generation timing
+
+The Qwen request is intentionally bounded so a demo cannot hang forever:
+
+```text
+REQUEST_TIMEOUT_MS = 90_000
+MAX_TOKENS = 1_200
+```
+
+The live prompt is kept concise and asks for exactly four short guide cards. If the badge still reports a timeout, check whether the request is being stopped by Qwen latency, network conditions, or the reverse proxy before the app receives a model response.
+
 ## Recommended hackathon path
 
 For the public hackathon submission, use the simplest reliable runtime that can run a Next.js Node server:
