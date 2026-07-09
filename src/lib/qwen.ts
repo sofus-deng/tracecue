@@ -2,10 +2,18 @@ import { z } from 'zod';
 
 import type { GuideCard, GuideGenerationMeta, ReviewStatus, SourceChunk, SourceDocument } from './types';
 
-const DEFAULT_MODEL = 'qwen3.7-plus';
 const DEFAULT_BASE_URL = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
+const DEFAULT_MODEL_CHAIN = [
+  'qwen3.7-max',
+  'qwen3.7-plus',
+  'qwen3.6-plus',
+  'qwen3.6-flash',
+  'qwen3.5-plus',
+  'qwen3.5-flash',
+] as const;
 const REQUEST_TIMEOUT_MS = 90_000;
 const MAX_TOKENS = 1_200;
+const FREE_TIER_EXHAUSTED_CODE = 'AllocationQuota.FreeTierOnly';
 
 const reviewStatuses = ['pending', 'approved', 'edited', 'rejected'] as const satisfies readonly ReviewStatus[];
 
@@ -39,8 +47,15 @@ type ResolveGuideCardsResult = {
 type QwenConfig = {
   apiKey: string;
   baseUrl: string;
-  model: string;
+  modelChain: string[];
 };
+
+class QwenQuotaExhaustedError extends Error {
+  constructor(readonly model: string, message: string) {
+    super(message);
+    this.name = 'QwenQuotaExhaustedError';
+  }
+}
 
 function generationMeta(mode: GuideGenerationMeta['mode'], model: string, reason: string): GuideGenerationMeta {
   return {
@@ -63,8 +78,16 @@ function deterministicFallback(
   };
 }
 
+function readModelChain(): string[] {
+  const rawChain = process.env.QWEN_MODEL_CHAIN?.trim();
+  const chain = rawChain
+    ? rawChain.split(',').map((model) => model.trim()).filter(Boolean)
+    : [...DEFAULT_MODEL_CHAIN];
+
+  return [...new Set(chain)];
+}
+
 function readQwenConfig(): QwenConfig | null {
-  const model = process.env.QWEN_MODEL?.trim() || DEFAULT_MODEL;
   const apiKey = process.env.QWEN_API_KEY?.trim() || process.env.DASHSCOPE_API_KEY?.trim();
 
   if (process.env.QWEN_LIVE_GENERATION !== 'true') {
@@ -78,7 +101,7 @@ function readQwenConfig(): QwenConfig | null {
   return {
     apiKey,
     baseUrl: process.env.QWEN_BASE_URL?.trim() || DEFAULT_BASE_URL,
-    model,
+    modelChain: readModelChain(),
   };
 }
 
@@ -151,7 +174,11 @@ function validateGeneratedCards(rawContent: string, sourceChunks: SourceChunk[])
   }));
 }
 
-async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promise<string> {
+function isFreeTierExhausted(status: number, body: string): boolean {
+  return status === 403 && body.includes(FREE_TIER_EXHAUSTED_CODE);
+}
+
+async function requestQwenGuideCards(config: QwenConfig, model: string, prompt: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -163,7 +190,7 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: config.model,
+        model,
         messages: [
           {
             role: 'system',
@@ -183,7 +210,16 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
     });
 
     if (!response.ok) {
-      throw new Error(`Qwen request failed with HTTP ${response.status}.`);
+      const errorBody = await response.text();
+
+      if (isFreeTierExhausted(response.status, errorBody)) {
+        throw new QwenQuotaExhaustedError(
+          model,
+          `${model} free quota is exhausted; trying the next configured model.`,
+        );
+      }
+
+      throw new Error(`Qwen request failed for ${model} with HTTP ${response.status}. ${errorBody}`.trim());
     }
 
     const payload = (await response.json()) as {
@@ -192,13 +228,13 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
     const content = payload.choices?.[0]?.message?.content;
 
     if (typeof content !== 'string' || content.trim().length === 0) {
-      throw new Error('Qwen response did not include message content.');
+      throw new Error(`Qwen response from ${model} did not include message content.`);
     }
 
     return content;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Qwen request timed out after ${Math.round(REQUEST_TIMEOUT_MS / 1000)} seconds.`);
+      throw new Error(`Qwen request for ${model} timed out after ${Math.round(REQUEST_TIMEOUT_MS / 1000)} seconds.`);
     }
 
     throw error;
@@ -213,13 +249,14 @@ export async function resolveGuideCardsWithFallback({
   sourceChunks,
   allowLiveGeneration = false,
 }: ResolveGuideCardsInput): Promise<ResolveGuideCardsResult> {
-  const model = process.env.QWEN_MODEL?.trim() || DEFAULT_MODEL;
+  const modelChain = readModelChain();
+  const primaryModel = modelChain[0] ?? 'unconfigured';
 
   if (process.env.QWEN_LIVE_GENERATION !== 'true') {
     return deterministicFallback(
       deterministicCards,
       'deterministic_fallback',
-      model,
+      primaryModel,
       'Qwen live generation is disabled; using deterministic demo cards.',
     );
   }
@@ -228,7 +265,7 @@ export async function resolveGuideCardsWithFallback({
     return deterministicFallback(
       deterministicCards,
       'deterministic_fallback',
-      model,
+      primaryModel,
       'Qwen live generation is enabled, but automatic page-load model calls are disabled. Use Run demo slice for an explicit one-time live generation request.',
     );
   }
@@ -239,22 +276,40 @@ export async function resolveGuideCardsWithFallback({
     return deterministicFallback(
       deterministicCards,
       'qwen_unconfigured_fallback',
-      model,
+      primaryModel,
       'Qwen live generation is enabled but no server-side API key is configured.',
     );
   }
 
-  try {
-    const rawContent = await requestQwenGuideCards(config, buildPrompt(sourceDocuments, sourceChunks));
-    const guideCards = validateGeneratedCards(rawContent, sourceChunks);
+  const prompt = buildPrompt(sourceDocuments, sourceChunks);
+  const exhaustedModels: string[] = [];
 
-    return {
-      guideCards,
-      generationMeta: generationMeta('qwen_live', config.model, 'Qwen live generation succeeded.'),
-    };
-  } catch (error) {
-    const reason = error instanceof Error ? error.message : 'Qwen generation failed for an unknown reason.';
+  for (const model of config.modelChain) {
+    try {
+      const rawContent = await requestQwenGuideCards(config, model, prompt);
+      const guideCards = validateGeneratedCards(rawContent, sourceChunks);
+      const skippedModels = exhaustedModels.length > 0 ? ` Skipped exhausted models: ${exhaustedModels.join(', ')}.` : '';
 
-    return deterministicFallback(deterministicCards, 'qwen_failed_fallback', config.model, reason);
+      return {
+        guideCards,
+        generationMeta: generationMeta('qwen_live', model, `Qwen live generation succeeded with ${model}.${skippedModels}`),
+      };
+    } catch (error) {
+      if (error instanceof QwenQuotaExhaustedError) {
+        exhaustedModels.push(error.model);
+        continue;
+      }
+
+      const reason = error instanceof Error ? error.message : 'Qwen generation failed for an unknown reason.';
+
+      return deterministicFallback(deterministicCards, 'qwen_failed_fallback', model, reason);
+    }
   }
+
+  return deterministicFallback(
+    deterministicCards,
+    'qwen_quota_paused',
+    config.modelChain.join(' > '),
+    `暫停運作：configured Qwen free-tier quota is exhausted for all models in order: ${config.modelChain.join(' > ')}.`,
+  );
 }
