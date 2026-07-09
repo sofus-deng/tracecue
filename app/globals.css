@@ -1,13 +1,14 @@
 :root {
-  color-scheme: dark;
-  --trace-bg: #080705;
-  --trace-panel: rgba(19, 17, 14, 0.78);
-  --trace-border: rgba(255, 224, 178, 0.16);
-  --trace-line: rgba(255, 224, 178, 0.1);
-  --trace-amber: #ffbf69;
-  --trace-copper: #d98e55;
-  --trace-ink: #fff7ed;
-  --trace-muted: #b5aaa0;
+  color-scheme: light;
+  --trace-bg: #f6f8fb;
+  --trace-panel: #ffffff;
+  --trace-panel-muted: #f9fafb;
+  --trace-border: #dfe5ec;
+  --trace-line: #e8edf3;
+  --trace-accent: #0f8f7f;
+  --trace-accent-strong: #0b6f63;
+  --trace-ink: #17212b;
+  --trace-muted: #657384;
 }
 
 * {
@@ -19,27 +20,12 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at 18% 12%, rgba(255, 191, 105, 0.16), transparent 28rem),
-    radial-gradient(circle at 82% 0%, rgba(127, 90, 240, 0.15), transparent 30rem),
-    linear-gradient(135deg, #080705 0%, #10100f 48%, #1c1410 100%);
+    linear-gradient(180deg, #ffffff 0%, var(--trace-bg) 48%, #eef4f7 100%);
   color: var(--trace-ink);
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.32;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: linear-gradient(to bottom, black, transparent 92%);
-}
-
 ::selection {
-  background: rgba(255, 191, 105, 0.35);
+  background: rgba(15, 143, 127, 0.16);
 }
 
 a {
@@ -49,29 +35,30 @@ a {
 
 .trace-shell {
   min-height: 100svh;
-  padding: 28px;
+  padding: 24px;
 }
 
 .trace-glass {
   border: 1px solid var(--trace-border);
   background: var(--trace-panel);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 28px rgba(23, 33, 43, 0.06);
 }
 
 .trace-orb {
-  position: absolute;
-  inset: auto 6% 8% auto;
-  width: 220px;
-  height: 220px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 191, 105, 0.26), transparent 64%);
-  filter: blur(4px);
-  pointer-events: none;
+  display: none;
 }
 
 .trace-kicker {
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
   text-transform: uppercase;
-  color: var(--trace-amber);
+  color: var(--trace-accent-strong);
+}
+
+.trace-subtle-panel {
+  border: 1px solid var(--trace-line);
+  background: var(--trace-panel-muted);
+}
+
+.trace-rule {
+  border-color: var(--trace-line);
 }
