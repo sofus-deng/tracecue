@@ -1,90 +1,128 @@
 # TraceCue Agent — Codex Instructions
 
-This repository is a local-first starter for building TraceCue Agent with Codex on macOS.
+This repository is the public WorkCue Open implementation of TraceCue Agent.
 
-## Public repo boundary
+Use these instructions for every coding pass in this repository.
 
-This repository is intended to become open source for the hackathon submission.
+## Product Direction
 
-Do not add internal strategy, private planning notes, commercial roadmaps, pricing, sales playbooks, customer lists, customer documents, private prompt chains, or engine-vault content to this repository.
+New TraceCue is not the old Client Handoff demo.
 
-All public-facing content must be synthetic, generic, and safe for external reviewers to inspect.
+New TraceCue is a public, synthetic, source-grounded work-instruction agent for equipment after-sales and frontline procedure guidance.
 
-High-level product language is allowed. Internal WorkCue strategy is not.
+Primary scenario:
 
-## Product focus
+```text
+Equipment after-sales QR guide
+```
 
-TraceCue should win attention with two excellent capabilities, not many weak features:
+Core product promise:
 
-1. ProcedureLedger
-2. Publish Gate
+> TraceCue turns messy operational source material into reviewable guide cards, proves where each instruction came from, and blocks unsupported or risky steps before a QR guide reaches a frontline user.
 
-Core promise:
+## Relationship To WorkCue
 
-> Every generated guide card must either prove where it came from or be blocked / marked for review before publishing.
+- WorkCue is the commercial product line.
+- TraceCue is the public WorkCue Open / Qwen Cloud reference implementation.
+- Do not expose internal WorkCue strategy, pricing, sales notes, customer lists, customer materials, private prompts, or engine-vault content in this repository.
+- All repo content must remain synthetic, generic, and safe for public review.
 
-## Work items
+## Current Build Target
+
+Build a polished new TraceCue slice around:
+
+```text
+synthetic after-sales source pack
+-> source chunks
+-> Qwen guide generation
+-> source guard
+-> risk guard
+-> human review state
+-> QR guide preview
+-> ProcedureLedger
+-> Publish Gate
+-> exportable proof
+```
+
+The old Client Handoff content can remain only as legacy reference until replaced. Do not make it the main product narrative for new work.
+
+## Qwen Runtime Rules
+
+- Qwen live generation must only run from an explicit user action such as `Run Qwen pass`.
+- Do not auto-call Qwen on page load.
+- Preserve the model-chain quota strategy.
+- If free quota is exhausted, show a paused state instead of silently pretending generation succeeded.
+- Deterministic fallback is allowed as a safety path, but UI and exports must clearly state when fallback was used.
+- Never commit `.env.local` or API keys.
+
+## UI Direction
+
+TraceCue should not look like a generic AI SaaS landing page.
+
+Design target:
+
+- evidence console
+- source ledger
+- QR guide workbench
+- professional but distinctive
+- readable under demo pressure
+- strong visual hierarchy without decorative AI gradients
+- clear proof trail from source to publish decision
+
+Avoid:
+
+- generic purple AI gradients
+- vague chat UI
+- decorative prompt boxes
+- marketing-only hero sections
+- dark glassmorphism that hides the actual product
+
+## Work Items
 
 Read `WORK_ITEMS.md` before starting each coding pass.
 
-Complete only the current priority item unless the user explicitly asks for more.
+Update `WORK_ITEMS.md` when starting or completing a meaningful task.
 
-## Current scope
+Use these status values:
 
-Build one excellent demo slice:
+- `todo`
+- `in_progress`
+- `done`
+- `blocked`
 
-```text
-synthetic source documents
--> source chunks
--> guide cards
--> source guard
--> risk guard
--> ProcedureLedger
--> Publish Gate
--> revision proposal
-```
+Work on only the current priority item unless the user explicitly asks for a broader pass.
 
-## Do not build yet
+## Technical Choices
 
-- authentication
-- billing
-- multi-tenant SaaS
-- PDF/OCR upload
-- multi-scenario template library
-- full benchmark UI
-- database persistence before the demo slice is visually excellent
-
-## Technical choices
-
-- Use Next.js 16.2.x App Router.
-- Use Mantine components instead of hand-building UI primitives.
+- Use Next.js App Router.
+- Use Mantine components and existing project patterns.
 - Keep TypeScript strict.
 - Keep demo data synthetic.
-- Keep all code readable enough for a hackathon judge or reviewer to inspect.
-
-## UI direction
-
-Top AI startup feel:
-
-- dark graphite / warm amber tone
-- glass panels
-- strong hierarchy
-- dense but readable dashboard
-- clear evidence trail
-- no generic SaaS template look
+- Keep the app inspectable for public reviewers.
+- Keep edits scoped; do not introduce auth, billing, database persistence, or multi-tenant SaaS behavior unless explicitly requested.
 
 ## Validation
 
-Run these before committing meaningful changes:
+For UI, TypeScript, or runtime changes, run:
 
 ```bash
 pnpm typecheck
 pnpm build
+pnpm lint
 ```
 
-## Completion report
+If one command fails, fix the failure before continuing to unrelated work.
 
-When Codex finishes a pass, report:
+For Qwen runtime changes, also verify:
+
+- page load does not call Qwen automatically
+- manual run can reach `qwen_live` when quota and config are valid
+- quota exhaustion reaches `qwen_quota_paused`
+- exported ledger records the generation mode and model
+
+## Completion Report
+
+When a coding pass finishes, report:
 
 - files changed
 - validation commands and results
