@@ -1,14 +1,15 @@
 :root {
   color-scheme: light;
-  --trace-bg: #f6f8fb;
+  --trace-bg: #f4f7f8;
   --trace-panel: #ffffff;
-  --trace-panel-muted: #f9fafb;
-  --trace-border: #dfe5ec;
-  --trace-line: #e8edf3;
-  --trace-accent: #0f8f7f;
-  --trace-accent-strong: #0b6f63;
-  --trace-ink: #17212b;
-  --trace-muted: #657384;
+  --trace-panel-muted: #eef6f4;
+  --trace-border: #131a20;
+  --trace-line: #d8e2e4;
+  --trace-accent: #00a88e;
+  --trace-accent-strong: #057a6c;
+  --trace-signal: #d8ff4f;
+  --trace-ink: #10171d;
+  --trace-muted: #62717c;
 }
 
 * {
@@ -20,12 +21,15 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    linear-gradient(180deg, #ffffff 0%, var(--trace-bg) 48%, #eef4f7 100%);
+    linear-gradient(90deg, rgba(16, 23, 29, 0.045) 1px, transparent 1px),
+    linear-gradient(rgba(16, 23, 29, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #fbfcfd 0%, var(--trace-bg) 100%);
+  background-size: 28px 28px, 28px 28px, auto;
   color: var(--trace-ink);
 }
 
 ::selection {
-  background: rgba(15, 143, 127, 0.16);
+  background: rgba(0, 168, 142, 0.22);
 }
 
 a {
@@ -39,9 +43,9 @@ a {
 }
 
 .trace-glass {
-  border: 1px solid var(--trace-border);
+  border: 1.5px solid var(--trace-border);
   background: var(--trace-panel);
-  box-shadow: 0 10px 28px rgba(23, 33, 43, 0.06);
+  box-shadow: 6px 6px 0 rgba(16, 23, 29, 0.08);
 }
 
 .trace-orb {
@@ -61,4 +65,45 @@ a {
 
 .trace-rule {
   border-color: var(--trace-line);
+}
+
+.trace-ledger-strip {
+  border-left: 6px solid var(--trace-accent);
+}
+
+.trace-evidence-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+  letter-spacing: 0;
+}
+
+.trace-card-index {
+  border: 1px solid var(--trace-border);
+  background: var(--trace-signal);
+  color: var(--trace-ink);
+}
+
+.trace-source-pill {
+  border-color: var(--trace-accent-strong);
+  color: var(--trace-accent-strong);
+  background: #f7fffd;
+}
+
+.trace-workbench {
+  position: relative;
+}
+
+.trace-workbench::before {
+  content: '';
+  position: absolute;
+  inset: 16px auto auto 16px;
+  width: 72px;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--trace-ink) 0 8px, transparent 8px 14px);
+  opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+  .trace-shell {
+    padding: 12px;
+  }
 }
