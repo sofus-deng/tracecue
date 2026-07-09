@@ -27,6 +27,7 @@ type ResolveGuideCardsInput = {
   deterministicCards: GuideCard[];
   sourceDocuments: SourceDocument[];
   sourceChunks: SourceChunk[];
+  allowLiveGeneration?: boolean;
 };
 
 type ResolveGuideCardsResult = {
@@ -207,6 +208,7 @@ export async function resolveGuideCardsWithFallback({
   deterministicCards,
   sourceDocuments,
   sourceChunks,
+  allowLiveGeneration = false,
 }: ResolveGuideCardsInput): Promise<ResolveGuideCardsResult> {
   const model = process.env.QWEN_MODEL?.trim() || DEFAULT_MODEL;
 
@@ -219,12 +221,12 @@ export async function resolveGuideCardsWithFallback({
     );
   }
 
-  if (process.env.QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION !== 'true') {
+  if (!allowLiveGeneration && process.env.QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION !== 'true') {
     return deterministicFallback(
       deterministicCards,
       'deterministic_fallback',
       model,
-      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Set QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true only during controlled demos.',
+      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Use Run demo slice for an explicit one-time live generation request.',
     );
   }
 
