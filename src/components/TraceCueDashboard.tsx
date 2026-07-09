@@ -67,6 +67,8 @@ type TraceCueDashboardProps = {
   sourceDocuments: SourceDocument[];
 };
 
+type RunDemoResponse = TraceCueDashboardProps;
+
 const generationStatus = {
   deterministic_fallback: { label: 'Generation: deterministic fallback', color: 'gray' },
   qwen_live: { label: 'Generation: Qwen live', color: 'green' },
@@ -75,29 +77,73 @@ const generationStatus = {
 } as const;
 
 export function TraceCueDashboard({
-  generationMeta,
-  guardedCards,
-  ledger,
+  generationMeta: initialGenerationMeta,
+  guardedCards: initialGuardedCards,
+  ledger: initialLedger,
   sourceChunks,
   sourceDocuments,
 }: TraceCueDashboardProps) {
   const [feedback, setFeedback] = useState('Step 5 is unclear. What does a good bug report look like?');
-  const publishable = guardedCards.filter((card) => card.publishGateStatus === 'publishable');
-  const blocked = guardedCards.filter((card) => card.publishGateStatus === 'blocked');
-  const needsReview = guardedCards.filter((card) => card.publishGateStatus === 'needs_review');
-  const currentGenerationStatus = generationStatus[generationMeta.mode];
+  const [currentGenerationMeta, setCurrentGenerationMeta] = useState(initialGenerationMeta);
+  const [currentGuardedCards, setCurrentGuardedCards] = useState(initialGuardedCards);
+  const [currentLedger, setCurrentLedger] = useState(initialLedger);
+  const [isRunningDemo, setIsRunningDemo] = useState(false);
+  const publishable = currentGuardedCards.filter((card) => card.publishGateStatus === 'publishable');
+  const blocked = currentGuardedCards.filter((card) => card.publishGateStatus === 'blocked');
+  const needsReview = currentGuardedCards.filter((card) => card.publishGateStatus === 'needs_review');
+  const currentGenerationStatus = generationStatus[currentGenerationMeta.mode];
+
+  async function runDemoSlice() {
+    setIsRunningDemo(true);
+
+    try {
+      const response = await fetch('/api/run-demo', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Run demo request failed with HTTP ${response.status}.`);
+      }
+
+      const payload = (await response.json()) as RunDemoResponse;
+
+      setCurrentGenerationMeta(payload.generationMeta);
+      setCurrentGuardedCards(payload.guardedCards);
+      setCurrentLedger(payload.ledger);
+
+      notifications.show({
+        title: payload.generationMeta.mode === 'qwen_live' ? 'Qwen live generation succeeded' : 'Demo run completed with fallback',
+        message: payload.generationMeta.reason,
+        color: payload.generationMeta.mode === 'qwen_live' ? 'green' : 'yellow',
+        icon: <IconCheck size={16} />,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Run demo request failed for an unknown reason.';
+
+      notifications.show({
+        title: 'Run demo failed',
+        message,
+        color: 'red',
+      });
+    } finally {
+      setIsRunningDemo(false);
+    }
+  }
 
   function exportLedgerJson() {
     const exportPayload = {
       generatedAt: new Date().toISOString(),
       demoName: 'client-handoff',
-      generationMeta,
-      procedureLedger: ledger,
+      generationMeta: currentGenerationMeta,
+      procedureLedger: currentLedger,
       sourceDocuments,
       sourceChunks,
-      guardedGuideCards: guardedCards,
+      guardedGuideCards: currentGuardedCards,
       publishGateSummary: {
-        status: ledger.publishStatus,
+        status: currentLedger.publishStatus,
         publishableCount: publishable.length,
         needsReviewCount: needsReview.length,
         blockedCount: blocked.length,
@@ -105,7 +151,7 @@ export function TraceCueDashboard({
         needsReviewStepIds: needsReview.map((card) => card.id),
         blockedStepIds: blocked.map((card) => card.id),
       },
-      revisionProposal: ledger.revisionProposal,
+      revisionProposal: currentLedger.revisionProposal,
     };
     const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
       type: 'application/json;charset=utf-8',
@@ -140,7 +186,7 @@ export function TraceCueDashboard({
                 <Badge variant="outline" color="gray" size="lg">
                   TraceCue Agent
                 </Badge>
-                <Tooltip label={`${generationMeta.reason} Model: ${generationMeta.model}`} multiline w={320}>
+                <Tooltip label={`${currentGenerationMeta.reason} Model: ${currentGenerationMeta.model}`} multiline w={320}>
                   <Badge variant="light" color={currentGenerationStatus.color} size="lg">
                     {currentGenerationStatus.label}
                   </Badge>
@@ -154,8 +200,15 @@ export function TraceCueDashboard({
                 and a Publish Gate that blocks risky or unsupported steps before they become client-facing instructions.
               </Text>
               <Group mt="sm">
-                <Button size="md" radius="xl" leftSection={<IconPlayerPlay size={18} />} color="orange">
-                  Run demo slice
+                <Button
+                  size="md"
+                  radius="xl"
+                  leftSection={<IconPlayerPlay size={18} />}
+                  color="orange"
+                  loading={isRunningDemo}
+                  onClick={runDemoSlice}
+                >
+                  {isRunningDemo ? 'Running Qwen...' : 'Run demo slice'}
                 </Button>
                 <Button
                   size="md"
@@ -173,10 +226,10 @@ export function TraceCueDashboard({
               size={150}
               thickness={14}
               roundCaps
-              sections={[{ value: ledger.sourceCoverage, color: 'orange' }]}
+              sections={[{ value: currentLedger.sourceCoverage, color: 'orange' }]}
               label={
                 <Stack align="center" gap={0}>
-                  <Text fz={28} fw={800}>{ledger.sourceCoverage}%</Text>
+                  <Text fz={28} fw={800}>{currentLedger.sourceCoverage}%</Text>
                   <Text fz="xs" c="dimmed">source coverage</Text>
                 </Stack>
               }
@@ -239,16 +292,16 @@ export function TraceCueDashboard({
                     <Text size="sm" c="dimmed">{sourceChunks.length} chunks captured from synthetic inputs.</Text>
                   </Timeline.Item>
                   <Timeline.Item bullet={<IconShieldCheck size={14} />} title="Guard results">
-                    <Text size="sm" c="dimmed">{ledger.riskFlagCount} risk flags, {ledger.missingSourceStepIds.length} missing-source step.</Text>
+                    <Text size="sm" c="dimmed">{currentLedger.riskFlagCount} risk flags, {currentLedger.missingSourceStepIds.length} missing-source step.</Text>
                   </Timeline.Item>
                   <Timeline.Item bullet={<IconClipboardCheck size={14} />} title="Review state">
-                    <Text size="sm" c="dimmed">{ledger.reviewSummary}</Text>
+                    <Text size="sm" c="dimmed">{currentLedger.reviewSummary}</Text>
                   </Timeline.Item>
                   <Timeline.Item bullet={<IconLockCheck size={14} />} title="Publish state">
-                    <Text size="sm" c="dimmed">Current status: {ledger.publishStatus}</Text>
+                    <Text size="sm" c="dimmed">Current status: {currentLedger.publishStatus}</Text>
                   </Timeline.Item>
                   <Timeline.Item bullet={<IconArrowRight size={14} />} title="Revision target">
-                    <Text size="sm" c="dimmed">{ledger.revisionProposal}</Text>
+                    <Text size="sm" c="dimmed">{currentLedger.revisionProposal}</Text>
                   </Timeline.Item>
                 </Timeline>
               </Card>
@@ -265,7 +318,7 @@ export function TraceCueDashboard({
 
               <Tabs.Panel value="cards" pt="md">
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                  {guardedCards.map((card) => (
+                  {currentGuardedCards.map((card) => (
                     <Card key={card.id} className="trace-glass" radius="24px" p="lg">
                       <Group justify="space-between" align="start">
                         <Stack gap={4} maw="72%">
