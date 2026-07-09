@@ -74,7 +74,29 @@ const generationStatus = {
   qwen_live: { label: 'Generation: Qwen live', color: 'green' },
   qwen_unconfigured_fallback: { label: 'Generation: Qwen unconfigured -> fallback', color: 'yellow' },
   qwen_failed_fallback: { label: 'Generation: Qwen failed -> fallback', color: 'red' },
+  qwen_quota_paused: { label: 'Generation: paused - no free quota', color: 'red' },
 } as const;
+
+function notificationTone(mode: GuideGenerationMeta['mode']) {
+  if (mode === 'qwen_live') {
+    return {
+      title: 'Qwen live generation succeeded',
+      color: 'green',
+    } as const;
+  }
+
+  if (mode === 'qwen_quota_paused') {
+    return {
+      title: 'Live generation paused',
+      color: 'red',
+    } as const;
+  }
+
+  return {
+    title: 'Demo run completed with fallback',
+    color: 'yellow',
+  } as const;
+}
 
 export function TraceCueDashboard({
   generationMeta: initialGenerationMeta,
@@ -109,16 +131,17 @@ export function TraceCueDashboard({
       }
 
       const payload = (await response.json()) as RunDemoResponse;
+      const tone = notificationTone(payload.generationMeta.mode);
 
       setCurrentGenerationMeta(payload.generationMeta);
       setCurrentGuardedCards(payload.guardedCards);
       setCurrentLedger(payload.ledger);
 
       notifications.show({
-        title: payload.generationMeta.mode === 'qwen_live' ? 'Qwen live generation succeeded' : 'Demo run completed with fallback',
+        title: tone.title,
         message: payload.generationMeta.reason,
-        color: payload.generationMeta.mode === 'qwen_live' ? 'green' : 'yellow',
-        icon: <IconCheck size={16} />,
+        color: tone.color,
+        icon: payload.generationMeta.mode === 'qwen_live' ? <IconCheck size={16} /> : undefined,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Run demo request failed for an unknown reason.';
