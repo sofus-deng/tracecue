@@ -58,7 +58,7 @@ Replace the old Client Handoff scenario with a synthetic Equipment After-sales Q
 
 | ID | Status | Priority | Work Item | Exit Criteria |
 |---|---|---:|---|---|
-| AUTO001 | todo | P0 | Add local check script | `scripts/check.sh` runs typecheck, build, and lint |
+| AUTO001 | done | P0 | Add local check script | `scripts/check.sh` runs typecheck, build, and lint; `pnpm check` uses the same validation order |
 | AUTO002 | todo | P1 | Add ECS deploy helper | Optional script documents pull, install, check, build, restart, and status commands |
 | AUTO003 | todo | P1 | Add GitHub Actions CI | Pull requests run typecheck, build, and lint before merge |
 
