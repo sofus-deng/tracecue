@@ -237,7 +237,7 @@ export function TraceCueDashboard({
               </Group>
             </Group>
 
-            <Grid gutter="lg" align="stretch">
+            <Grid align="stretch">
               <Grid.Col span={{ base: 12, md: 8 }}>
                 <Stack gap="md" className="trace-ledger-strip" pl="md">
                   <Text className="trace-kicker" size="xs" fw={800}>
@@ -298,7 +298,7 @@ export function TraceCueDashboard({
           </Stack>
         </Paper>
 
-        <Grid mt="md" gutter="md">
+        <Grid mt="md">
           <Grid.Col span={{ base: 12, lg: 4 }}>
             <Stack gap="md">
               <Card className="trace-glass" radius="md" p="md">
