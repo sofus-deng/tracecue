@@ -4,7 +4,8 @@ import type { GuideCard, GuideGenerationMeta, ReviewStatus, SourceChunk, SourceD
 
 const DEFAULT_MODEL = 'qwen3.7-plus';
 const DEFAULT_BASE_URL = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
-const REQUEST_TIMEOUT_MS = 45_000;
+const REQUEST_TIMEOUT_MS = 90_000;
+const MAX_TOKENS = 1_200;
 
 const reviewStatuses = ['pending', 'approved', 'edited', 'rejected'] as const satisfies readonly ReviewStatus[];
 
@@ -82,30 +83,25 @@ function readQwenConfig(): QwenConfig | null {
 }
 
 function buildPrompt(sourceDocuments: SourceDocument[], sourceChunks: SourceChunk[]): string {
+  const sourceTitles = sourceDocuments
+    .map((sourceDocument) => `${sourceDocument.id}: ${sourceDocument.title}`)
+    .join('; ');
+  const allowedSourceRefs = sourceChunks.map((chunk) => chunk.id);
   const sourcePack = sourceChunks
-    .map((chunk) => {
-      const document = sourceDocuments.find((sourceDocument) => sourceDocument.id === chunk.documentId);
-
-      return [
-        `Chunk ID: ${chunk.id}`,
-        `Document: ${document?.title ?? chunk.documentId}`,
-        `Kind: ${document?.kind ?? 'unknown'}`,
-        `Label: ${chunk.label}`,
-        `Text: ${chunk.text}`,
-      ].join('\n');
-    })
-    .join('\n\n');
+    .map((chunk) => `${chunk.id} | ${chunk.label}: ${chunk.text}`)
+    .join('\n');
 
   return [
-    'Generate a Client Handoff Guide for a public-safe synthetic demo.',
-    'Use only the provided synthetic source chunks.',
-    'Each card must include sourceRefs that exactly match one or more provided Chunk ID values.',
-    'Do not invent customer facts, private details, policies, dates, names, prices, or commitments.',
-    'Return strict JSON only. Do not include markdown, comments, or prose outside the JSON object.',
-    'Use reviewStatus values compatible with the app: pending, approved, edited, rejected.',
-    'Return this shape: {"cards":[{"title":"Open the client handoff guide","purpose":"Give the client a single place to begin after delivery.","instructions":["Open the shared handoff link."],"completionCheck":"Client can find the guide and understand where to begin.","sourceRefs":["delivery-checklist#01"],"reviewStatus":"approved"}]}',
-    '',
-    'Synthetic source chunks:',
+    'Task: Generate a concise Client Handoff Guide for a public-safe synthetic demo.',
+    'Return JSON only. No markdown. No prose outside JSON.',
+    'Return exactly 4 cards. Each card should have 1-2 short instructions.',
+    'Use only the provided source chunks. Do not invent facts, policies, dates, names, prices, or commitments.',
+    `Allowed sourceRefs: ${JSON.stringify(allowedSourceRefs)}`,
+    'Every card must include one or more sourceRefs copied exactly from the allowed sourceRefs list.',
+    'Allowed reviewStatus values: pending, approved, edited, rejected.',
+    'Required JSON shape: {"cards":[{"title":"...","purpose":"...","instructions":["..."],"completionCheck":"...","sourceRefs":["handoff-notes#01"],"reviewStatus":"approved"}]}',
+    `Source documents: ${sourceTitles}`,
+    'Source chunks:',
     sourcePack,
   ].join('\n');
 }
@@ -172,14 +168,15 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
           {
             role: 'system',
             content:
-              'You generate source-grounded procedure guide cards for a public-safe synthetic demo. Return strict JSON only.',
+              'You generate concise, source-grounded procedure guide cards. Return strict JSON only.',
           },
           {
             role: 'user',
             content: prompt,
           },
         ],
-        temperature: 0.2,
+        temperature: 0.1,
+        max_tokens: MAX_TOKENS,
         response_format: { type: 'json_object' },
       }),
       signal: controller.signal,
@@ -199,6 +196,12 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
     }
 
     return content;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error(`Qwen request timed out after ${Math.round(REQUEST_TIMEOUT_MS / 1000)} seconds.`);
+    }
+
+    throw error;
   } finally {
     clearTimeout(timeoutId);
   }
