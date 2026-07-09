@@ -197,7 +197,7 @@ async function requestQwenGuideCards(config: QwenConfig, prompt: string): Promis
 
     return content;
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error(`Qwen request timed out after ${Math.round(REQUEST_TIMEOUT_MS / 1000)} seconds.`);
     }
 
