@@ -104,7 +104,7 @@ export function TraceCueDashboard({
   sourceChunks,
   sourceDocuments,
 }: TraceCueDashboardProps) {
-  const [feedback, setFeedback] = useState('Step 5 is unclear. What does a good bug report look like?');
+  const [feedback, setFeedback] = useState('Step 3 is unclear. How do I confirm the filter reset worked?');
   const [currentGenerationMeta, setCurrentGenerationMeta] = useState(initialGenerationMeta);
   const [currentGuardedCards, setCurrentGuardedCards] = useState(initialGuardedCards);
   const [currentLedger, setCurrentLedger] = useState(initialLedger);
@@ -126,7 +126,7 @@ export function TraceCueDashboard({
       });
 
       if (!response.ok) {
-        throw new Error(`Run demo request failed with HTTP ${response.status}.`);
+        throw new Error(`Run Qwen pass request failed with HTTP ${response.status}.`);
       }
 
       const payload = (await response.json()) as RunDemoResponse;
@@ -143,10 +143,10 @@ export function TraceCueDashboard({
         icon: payload.generationMeta.mode === 'qwen_live' ? <IconCheck size={16} /> : undefined,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Run demo request failed for an unknown reason.';
+      const message = error instanceof Error ? error.message : 'Run Qwen pass request failed for an unknown reason.';
 
       notifications.show({
-        title: 'Run demo failed',
+        title: 'Run Qwen pass failed',
         message,
         color: 'red',
       });
@@ -158,7 +158,7 @@ export function TraceCueDashboard({
   function exportLedgerJson() {
     const exportPayload = {
       generatedAt: new Date().toISOString(),
-      demoName: 'client-handoff',
+      demoName: 'equipment-after-sales-qr-guide',
       generationMeta: currentGenerationMeta,
       procedureLedger: currentLedger,
       sourceDocuments,
@@ -182,13 +182,13 @@ export function TraceCueDashboard({
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = 'tracecue-ledger-client-handoff-v1.json';
+    link.download = 'tracecue-ledger-equipment-after-sales-v1.json';
     link.click();
     URL.revokeObjectURL(url);
 
     notifications.show({
       title: 'Ledger exported',
-      message: 'Downloaded tracecue-ledger-client-handoff-v1.json',
+      message: 'Downloaded tracecue-ledger-equipment-after-sales-v1.json',
       color: 'green',
       icon: <IconCheck size={16} />,
     });
@@ -247,10 +247,10 @@ export function TraceCueDashboard({
                     Every instruction leaves a trail.
                   </Title>
                   <Text c="dimmed" fz={{ base: 'md', md: 'lg' }} maw={760}>
-                    TraceCue turns scattered operational notes into source-grounded guide cards, then proves which cards can ship, which need review, and which must stop.
+                    TraceCue turns messy after-sales source material into source-grounded QR guide cards, then proves which cards can ship, which need review, and which must stop.
                   </Text>
                   <Group gap="xs">
-                    <Kbd className="trace-evidence-code">Client Handoff</Kbd>
+                    <Kbd className="trace-evidence-code">Equipment After-sales QR Guide</Kbd>
                     <Kbd className="trace-evidence-code">ProcedureLedger v1.0</Kbd>
                     <Kbd className="trace-evidence-code">Model: {currentGenerationMeta.model}</Kbd>
                   </Group>
@@ -312,7 +312,7 @@ export function TraceCueDashboard({
                   </ThemeIcon>
                 </Group>
                 <Text c="dimmed" mt="xs" size="sm">
-                  Synthetic documents become grounded source chunks. The demo avoids real client data.
+                  Synthetic after-sales documents become grounded source chunks. The demo avoids real customer or equipment-owner data.
                 </Text>
                 <Accordion variant="contained" mt="md" radius="md">
                   {sourceDocuments.map((doc) => (
@@ -435,7 +435,7 @@ export function TraceCueDashboard({
                         <Text className="trace-kicker" fz="xs" fw={800}>Publish Gate</Text>
                         <Title order={2} fz="xl">Unsupported instructions stop here.</Title>
                         <Text c="dimmed" maw={720} size="sm">
-                          TraceCue separates source-grounded cards from risky or unsupported text before the guide becomes client-facing.
+                          TraceCue separates source-grounded cards from risky or unsupported text before the QR guide reaches frontline users.
                         </Text>
                       </Stack>
                       <ThemeIcon radius="md" variant="filled" color="dark" size="lg">
@@ -473,7 +473,7 @@ export function TraceCueDashboard({
                       <Badge color="gray" variant="outline">Recorded in ProcedureLedger</Badge>
                     </Group>
                     <Text mt="md" size="sm">
-                      Clarify Step 5 by adding a concrete example: <Code>URL + screenshot + device + browser + expected result</Code>. Keep source reference <Code>meeting-transcript#01</Code>.
+                      Clarify Step 3 by adding a concrete reset check: <Code>FILTER-90 clears + normal airflow resumes within one minute</Code>. Keep source reference <Code>filter-replacement#03</Code>.
                     </Text>
                   </Paper>
                 </Card>

@@ -115,14 +115,14 @@ function buildPrompt(sourceDocuments: SourceDocument[], sourceChunks: SourceChun
     .join('\n');
 
   return [
-    'Task: Generate a concise Client Handoff Guide for a public-safe synthetic demo.',
+    'Task: Generate a concise Equipment After-sales QR Guide for a public-safe synthetic demo.',
     'Return JSON only. No markdown. No prose outside JSON.',
-    'Return exactly 4 cards. Each card should have 1-2 short instructions.',
-    'Use only the provided source chunks. Do not invent facts, policies, dates, names, prices, or commitments.',
+    'Return exactly 4 cards. Each card should have 1-2 short frontline instructions for equipment after-sales service.',
+    'Use only the provided source chunks. Do not invent facts, policies, dates, names, prices, warranty approvals, repairs, or commitments.',
     `Allowed sourceRefs: ${JSON.stringify(allowedSourceRefs)}`,
     'Every card must include one or more sourceRefs copied exactly from the allowed sourceRefs list.',
     'Allowed reviewStatus values: pending, approved, edited, rejected.',
-    'Required JSON shape: {"cards":[{"title":"...","purpose":"...","instructions":["..."],"completionCheck":"...","sourceRefs":["handoff-notes#01"],"reviewStatus":"approved"}]}',
+    'Required JSON shape: {"cards":[{"title":"...","purpose":"...","instructions":["..."],"completionCheck":"...","sourceRefs":["filter-replacement#01"],"reviewStatus":"approved"}]}',
     `Source documents: ${sourceTitles}`,
     'Source chunks:',
     sourcePack,
@@ -266,7 +266,7 @@ export async function resolveGuideCardsWithFallback({
       deterministicCards,
       'deterministic_fallback',
       primaryModel,
-      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Use Run demo slice for an explicit one-time live generation request.',
+      'Qwen live generation is enabled, but automatic page-load model calls are disabled. Use Run Qwen pass for an explicit one-time live generation request.',
     );
   }
 

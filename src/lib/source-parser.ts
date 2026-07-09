@@ -11,7 +11,17 @@ export type SourceSection = {
   text: string;
 };
 
-const allowedKinds = ['handoff', 'faq', 'checklist', 'transcript', 'policy'] as const;
+const allowedKinds = [
+  'handoff',
+  'faq',
+  'checklist',
+  'transcript',
+  'policy',
+  'manual',
+  'troubleshooting',
+  'support',
+  'warranty',
+] as const;
 
 function parseMetadata(markdown: string): { metadata: SourceMetadata; body: string } {
   const frontmatterMatch = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);

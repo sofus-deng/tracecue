@@ -4,15 +4,16 @@ import { join } from 'node:path';
 import { chunkSourceDocuments, parseSourceDocumentsFromMarkdown, toSourceDocuments } from './source-parser';
 
 const sampleFiles = [
-  'client-handoff-notes.md',
-  'support-faq.md',
-  'delivery-checklist.md',
-  'meeting-transcript.md',
-  'support-policy-draft.md',
+  'maintenance-schedule.md',
+  'filter-replacement.md',
+  'fault-triage.md',
+  'support-escalation.md',
+  'safety-limits.md',
+  'warranty-boundaries.md',
 ];
 
 const sampleMarkdown = sampleFiles.map((fileName) =>
-  readFileSync(join(process.cwd(), 'samples', fileName), 'utf8'),
+  readFileSync(join(process.cwd(), 'samples', 'equipment-after-sales', fileName), 'utf8'),
 );
 
 export const parsedSourceDocuments = parseSourceDocumentsFromMarkdown(sampleMarkdown);

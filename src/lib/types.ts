@@ -1,7 +1,7 @@
 export type SourceDocument = {
   id: string;
   title: string;
-  kind: 'handoff' | 'faq' | 'checklist' | 'transcript' | 'policy';
+  kind: 'handoff' | 'faq' | 'checklist' | 'transcript' | 'policy' | 'manual' | 'troubleshooting' | 'support' | 'warranty';
   excerpt: string;
 };
 

@@ -33,8 +33,8 @@ Core promise:
 |---|---|---:|---|---|
 | NT001 | done | P0 | Align repo instructions with new TraceCue direction | `AGENTS.md` defines new TraceCue, Qwen runtime rules, validation, and UI direction |
 | NT002 | done | P0 | Add shared work item board | `WORK_ITEMS.md` tracks new TraceCue tasks and current priority |
-| NT003 | todo | P0 | Replace Client Handoff as primary scenario | App copy, demo name, source pack, and exports use equipment after-sales QR guide as the main scenario |
-| NT004 | todo | P0 | Create synthetic equipment after-sales source pack | Source documents cover maintenance, filter replacement, fault triage, support escalation, safety limits, and warranty boundaries |
+| NT003 | done | P0 | Replace Client Handoff as primary scenario | App copy, demo name, source pack, and exports use equipment after-sales QR guide as the main scenario |
+| NT004 | done | P0 | Create synthetic equipment after-sales source pack | Source documents cover maintenance, filter replacement, fault triage, support escalation, safety limits, and warranty boundaries |
 | NT005 | todo | P0 | Update Qwen prompt for after-sales guide cards | Manual Qwen run generates concise, source-grounded equipment guide cards with valid source refs |
 | NT006 | todo | P0 | Add QR guide preview | UI shows a mobile-style guide preview that could be reached from a QR code |
 | NT007 | todo | P0 | Add explicit review actions | Cards support approved, needs expert review, and blocked states in the UI |
