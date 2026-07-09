@@ -46,6 +46,7 @@ import {
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 
+import { buildGuideMarkdown } from '@/src/lib/guide-export';
 import type {
   GuardedGuideCard,
   GuideGenerationMeta,
@@ -292,6 +293,35 @@ export function TraceCueDashboard({
     });
   }
 
+  function exportGuideMarkdown() {
+    const markdown = buildGuideMarkdown({
+      exportedAt: new Date().toISOString(),
+      generationMeta: currentGenerationMeta,
+      guardedCards: currentGuardedCards,
+      ledger: currentLedger,
+      reviewDecisions,
+      sourceChunks,
+      sourceDocuments,
+    });
+    const blob = new Blob([markdown], {
+      type: 'text/markdown;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'tracecue-guide-equipment-after-sales-v1.md';
+    link.click();
+    URL.revokeObjectURL(url);
+
+    notifications.show({
+      title: 'Guide Markdown exported',
+      message: 'Downloaded tracecue-guide-equipment-after-sales-v1.md',
+      color: 'green',
+      icon: <IconCheck size={16} />,
+    });
+  }
+
   function applyReviewAction(card: GuardedGuideCard, action: DemoReviewAction) {
     const updatedReviewStatus = reviewStatusForAction(action);
     const reviewedCards = currentGuardedCards.map((candidate) =>
@@ -357,6 +387,15 @@ export function TraceCueDashboard({
                   onClick={runDemoSlice}
                 >
                   {isRunningDemo ? 'Running Qwen' : 'Run Qwen pass'}
+                </Button>
+                <Button
+                  size="sm"
+                  radius="md"
+                  variant="default"
+                  leftSection={<IconFileText size={16} />}
+                  onClick={exportGuideMarkdown}
+                >
+                  Export guide Markdown
                 </Button>
                 <Button
                   size="sm"
