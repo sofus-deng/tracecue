@@ -38,7 +38,8 @@ export type GuideGenerationMode =
   | 'deterministic_fallback'
   | 'qwen_live'
   | 'qwen_unconfigured_fallback'
-  | 'qwen_failed_fallback';
+  | 'qwen_failed_fallback'
+  | 'qwen_quota_paused';
 
 export type GuideGenerationMeta = {
   mode: GuideGenerationMode;
