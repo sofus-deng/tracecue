@@ -1,6 +1,7 @@
 QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen-plus
+QWEN_MODEL=qwen3.7-plus
 QWEN_LIVE_GENERATION=false
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent
