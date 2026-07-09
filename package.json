@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "validate": "pnpm typecheck && pnpm build"
+    "check": "pnpm typecheck && pnpm build && pnpm lint",
+    "validate": "pnpm check"
   },
   "dependencies": {
     "@mantine/core": "latest",
