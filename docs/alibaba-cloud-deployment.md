@@ -12,7 +12,7 @@ The demo should remain usable even without model credentials:
 synthetic markdown samples -> deterministic fallback guide cards -> Source Guard -> Risk Guard -> ProcedureLedger -> Publish Gate -> JSON export
 ```
 
-Qwen live generation is optional and must stay behind both `QWEN_LIVE_GENERATION=true` and `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true` when the current homepage SSR path is used.
+Qwen live generation is optional and should run through the explicit `Run demo slice` POST flow, not through passive homepage rendering.
 
 ## Cost guard
 
@@ -21,13 +21,17 @@ The homepage is a server-rendered Next.js page. If live generation is enabled on
 Default deployment should therefore keep:
 
 ```env
-QWEN_LIVE_GENERATION=false
 QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 ```
 
-For a controlled live demo only, temporarily enable both variables, restart the service, run the demo, then turn page-load live generation off again.
+To allow the `Run demo slice` button to trigger one explicit Qwen request, use:
 
-Future production behavior should move Qwen generation behind an explicit user action or authenticated API route instead of homepage render.
+```env
+QWEN_LIVE_GENERATION=true
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
+```
+
+Future production behavior should add authentication, rate limiting, and per-run cost controls around the explicit API route.
 
 ## Recommended hackathon path
 
@@ -36,7 +40,8 @@ For the public hackathon submission, use the simplest reliable runtime that can 
 1. Build the app with pnpm.
 2. Start the Next.js production server.
 3. Configure environment variables in the Alibaba Cloud runtime console or ECS `.env.local`.
-4. Keep live Qwen generation disabled unless running a controlled demo.
+4. Keep page-load Qwen generation disabled.
+5. Use `Run demo slice` for controlled live Qwen generation.
 
 A containerized Node.js runtime or a small ECS instance is enough for this demo. Function Compute or a more managed container platform can be evaluated later, but this repository does not include platform-specific infrastructure-as-code.
 
@@ -45,7 +50,8 @@ A containerized Node.js runtime or a small ECS instance is enough for this demo.
 The deployed app must support:
 
 - Server-side rendering for the homepage.
-- Outbound HTTPS calls to Alibaba Cloud Model Studio / DashScope only when Qwen live generation is explicitly enabled.
+- A POST `/api/run-demo` route for explicit Qwen live generation.
+- Outbound HTTPS calls to Alibaba Cloud Model Studio / DashScope only when Qwen live generation is explicitly triggered.
 - Static access to the synthetic markdown samples bundled in the repo.
 - JSON export from the browser.
 - No database dependency.
@@ -78,7 +84,7 @@ QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
 QWEN_MODEL=qwen3.7-plus
-QWEN_LIVE_GENERATION=false
+QWEN_LIVE_GENERATION=true
 QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent
 ```
@@ -90,7 +96,7 @@ Rules:
 - Do not expose model credentials through `NEXT_PUBLIC_*` variables.
 - Do not commit `.env.local` or any deployment secret.
 - Keep `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` unless intentionally testing live generation on homepage render.
-- After a controlled live demo, turn `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION` back to `false` and restart the service.
+- Use the `Run demo slice` button for explicit one-time live generation.
 
 ## Qwen endpoint notes
 
@@ -115,22 +121,22 @@ If the deployment uses a workspace-specific Model Studio endpoint, set `QWEN_BAS
 After deployment, verify:
 
 1. Open the app homepage.
-2. Confirm the generation badge says `Generation: deterministic fallback` when live generation or page-load live generation is disabled.
+2. Confirm the generation badge says `Generation: deterministic fallback` on initial load.
 3. Confirm source chunks, ProcedureLedger, guide cards, and Publish Gate sections render.
-4. Click `Export ledger JSON`.
-5. Confirm the exported JSON includes `generationMeta`, `procedureLedger`, `sourceDocuments`, `sourceChunks`, `guardedGuideCards`, and `publishGateSummary`.
-6. Confirm no API key appears in the page source, browser console, exported JSON, README, or docs.
+4. Click `Run demo slice` once.
+5. Confirm the button shows a loading state, then the generation badge updates to either `Generation: Qwen live` or a safe fallback state with the reason in the tooltip.
+6. Click `Export ledger JSON`.
+7. Confirm the exported JSON includes `generationMeta`, `procedureLedger`, `sourceDocuments`, `sourceChunks`, `guardedGuideCards`, and `publishGateSummary`.
+8. Confirm no API key appears in the page source, browser console, exported JSON, README, or docs.
 
-Optional Qwen live smoke test:
+Optional homepage live smoke test:
 
-1. Set a server-side `QWEN_API_KEY` or `DASHSCOPE_API_KEY`.
-2. Set `QWEN_LIVE_GENERATION=true`.
-3. Set `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true` only for the controlled smoke test.
-4. Restart the runtime.
-5. Open the homepage once.
-6. Confirm the generation badge says either `Generation: Qwen live` or a safe fallback state.
-7. Turn `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` again and restart the runtime.
-8. Confirm future homepage loads no longer call Qwen.
+1. Set `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true` only for the controlled homepage-render smoke test.
+2. Restart the runtime.
+3. Open the homepage once.
+4. Confirm the generation badge says either `Generation: Qwen live` or a safe fallback state.
+5. Turn `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` again and restart the runtime.
+6. Confirm future homepage loads no longer call Qwen.
 
 ## Public repo boundary
 
