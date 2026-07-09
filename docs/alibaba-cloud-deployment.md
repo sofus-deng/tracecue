@@ -12,7 +12,22 @@ The demo should remain usable even without model credentials:
 synthetic markdown samples -> deterministic fallback guide cards -> Source Guard -> Risk Guard -> ProcedureLedger -> Publish Gate -> JSON export
 ```
 
-Qwen live generation is optional and must stay behind `QWEN_LIVE_GENERATION=true`.
+Qwen live generation is optional and must stay behind both `QWEN_LIVE_GENERATION=true` and `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true` when the current homepage SSR path is used.
+
+## Cost guard
+
+The homepage is a server-rendered Next.js page. If live generation is enabled on page load, every homepage request can call Qwen. That includes manual refreshes, health checks, preview checks, crawlers, uptime monitors, or accidental visits.
+
+Default deployment should therefore keep:
+
+```env
+QWEN_LIVE_GENERATION=false
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
+```
+
+For a controlled live demo only, temporarily enable both variables, restart the service, run the demo, then turn page-load live generation off again.
+
+Future production behavior should move Qwen generation behind an explicit user action or authenticated API route instead of homepage render.
 
 ## Recommended hackathon path
 
@@ -20,17 +35,17 @@ For the public hackathon submission, use the simplest reliable runtime that can 
 
 1. Build the app with pnpm.
 2. Start the Next.js production server.
-3. Configure environment variables in the Alibaba Cloud runtime console.
-4. Keep `QWEN_LIVE_GENERATION=false` unless a server-side Qwen API key is configured.
+3. Configure environment variables in the Alibaba Cloud runtime console or ECS `.env.local`.
+4. Keep live Qwen generation disabled unless running a controlled demo.
 
-A containerized Node.js runtime or a small ECS instance is enough for this demo. Function Compute or a more managed container platform can be evaluated later, but T007 does not add platform-specific infrastructure-as-code.
+A containerized Node.js runtime or a small ECS instance is enough for this demo. Function Compute or a more managed container platform can be evaluated later, but this repository does not include platform-specific infrastructure-as-code.
 
 ## Required runtime behavior
 
 The deployed app must support:
 
 - Server-side rendering for the homepage.
-- Outbound HTTPS calls to Alibaba Cloud Model Studio / DashScope only when Qwen live generation is enabled.
+- Outbound HTTPS calls to Alibaba Cloud Model Studio / DashScope only when Qwen live generation is explicitly enabled.
 - Static access to the synthetic markdown samples bundled in the repo.
 - JSON export from the browser.
 - No database dependency.
@@ -56,14 +71,15 @@ The app uses the Next.js default port unless the hosting runtime provides a `POR
 
 ## Environment variables
 
-Configure these in the Alibaba Cloud runtime environment, not in source control:
+Configure these in the Alibaba Cloud runtime environment or ECS `.env.local`, not in source control:
 
 ```env
 QWEN_API_KEY=
 DASHSCOPE_API_KEY=
 QWEN_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen-plus
+QWEN_MODEL=qwen3.7-plus
 QWEN_LIVE_GENERATION=false
+QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false
 NEXT_PUBLIC_APP_NAME=TraceCue Agent
 ```
 
@@ -73,7 +89,8 @@ Rules:
 - `DASHSCOPE_API_KEY` is supported as a compatibility fallback.
 - Do not expose model credentials through `NEXT_PUBLIC_*` variables.
 - Do not commit `.env.local` or any deployment secret.
-- Keep `QWEN_LIVE_GENERATION=false` for a stable recorded demo unless live model credentials are available.
+- Keep `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` unless intentionally testing live generation on homepage render.
+- After a controlled live demo, turn `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION` back to `false` and restart the service.
 
 ## Qwen endpoint notes
 
@@ -85,6 +102,12 @@ The default base URL remains:
 https://dashscope-intl.aliyuncs.com/compatible-mode/v1
 ```
 
+The default model is:
+
+```text
+qwen3.7-plus
+```
+
 If the deployment uses a workspace-specific Model Studio endpoint, set `QWEN_BASE_URL` in the runtime environment instead of changing source code.
 
 ## Deployment smoke checklist
@@ -92,7 +115,7 @@ If the deployment uses a workspace-specific Model Studio endpoint, set `QWEN_BAS
 After deployment, verify:
 
 1. Open the app homepage.
-2. Confirm the generation badge says `Generation: deterministic fallback` when live generation is disabled.
+2. Confirm the generation badge says `Generation: deterministic fallback` when live generation or page-load live generation is disabled.
 3. Confirm source chunks, ProcedureLedger, guide cards, and Publish Gate sections render.
 4. Click `Export ledger JSON`.
 5. Confirm the exported JSON includes `generationMeta`, `procedureLedger`, `sourceDocuments`, `sourceChunks`, `guardedGuideCards`, and `publishGateSummary`.
@@ -102,10 +125,12 @@ Optional Qwen live smoke test:
 
 1. Set a server-side `QWEN_API_KEY` or `DASHSCOPE_API_KEY`.
 2. Set `QWEN_LIVE_GENERATION=true`.
-3. Restart the runtime.
-4. Open the homepage.
-5. Confirm the generation badge says either `Generation: Qwen live` or a safe fallback state.
-6. If Qwen returns invalid output, confirm the app still renders deterministic fallback cards.
+3. Set `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=true` only for the controlled smoke test.
+4. Restart the runtime.
+5. Open the homepage once.
+6. Confirm the generation badge says either `Generation: Qwen live` or a safe fallback state.
+7. Turn `QWEN_ALLOW_PAGE_LOAD_LIVE_GENERATION=false` again and restart the runtime.
+8. Confirm future homepage loads no longer call Qwen.
 
 ## Public repo boundary
 
@@ -122,9 +147,9 @@ This repository must not include:
 - Private prompt chains.
 - Internal roadmap content.
 
-## Out of scope for T007
+## Out of scope
 
-T007 intentionally does not add:
+This repository intentionally does not add:
 
 - Infrastructure-as-code.
 - Dockerfile.
