@@ -37,7 +37,7 @@ Core promise:
 | NT004 | done | P0 | Create synthetic equipment after-sales source pack | Source documents cover maintenance, filter replacement, fault triage, support escalation, safety limits, and warranty boundaries |
 | NT005 | todo | P0 | Update Qwen prompt for after-sales guide cards | Manual Qwen run generates concise, source-grounded equipment guide cards with valid source refs |
 | NT006 | done | P0 | Add QR guide preview | UI shows a mobile-style guide preview that could be reached from a QR code |
-| NT007 | todo | P0 | Add explicit review actions | Cards support approved, needs expert review, and blocked states in the UI |
+| NT007 | done | P0 | Add explicit review actions | Cards support approved, needs expert review, and blocked states in the UI |
 | NT008 | todo | P1 | Add exportable guide artifact | Export Markdown or HTML guide in addition to ProcedureLedger JSON |
 | NT009 | todo | P1 | Improve quota-state messaging | UI clearly distinguishes Qwen live, fallback, unconfigured, failed, and quota paused states |
 | NT010 | todo | P1 | Add visual QA checklist | README or docs include desktop/mobile screenshots to capture before submission |

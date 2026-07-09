@@ -50,15 +50,47 @@ import type {
   GuardedGuideCard,
   GuideGenerationMeta,
   ProcedureLedger,
+  PublishGateStatus,
+  ReviewStatus,
   SourceChunk,
   SourceDocument,
 } from '@/src/lib/types';
+import { buildProcedureLedger, guardCards } from '@/src/lib/guards';
 
 const statusColor = {
   publishable: 'green',
   needs_review: 'yellow',
   blocked: 'red',
 } as const;
+
+type DemoReviewAction = 'approved' | 'needs_expert_review' | 'blocked';
+
+type DemoReviewDecision = {
+  action: DemoReviewAction;
+  label: string;
+  reason: string;
+  decidedAt: string;
+  sessionOnly: true;
+};
+
+const reviewActionLabels = {
+  approved: 'Approved',
+  needs_expert_review: 'Needs expert review',
+  blocked: 'Blocked',
+} as const satisfies Record<DemoReviewAction, string>;
+
+const reviewActionColors = {
+  approved: 'green',
+  needs_expert_review: 'yellow',
+  blocked: 'red',
+} as const satisfies Record<DemoReviewAction, string>;
+
+const reviewStatusLabels = {
+  approved: 'Approved',
+  pending: 'Needs expert review',
+  edited: 'Edited',
+  rejected: 'Blocked',
+} as const satisfies Record<ReviewStatus, string>;
 
 type TraceCueDashboardProps = {
   generationMeta: GuideGenerationMeta;
@@ -99,6 +131,56 @@ function notificationTone(mode: GuideGenerationMeta['mode']) {
   } as const;
 }
 
+function reviewStatusForAction(action: DemoReviewAction): ReviewStatus {
+  if (action === 'approved') {
+    return 'approved';
+  }
+
+  if (action === 'blocked') {
+    return 'rejected';
+  }
+
+  return 'pending';
+}
+
+function localPublishGateForReview(card: GuardedGuideCard): { status: PublishGateStatus; reason: string } {
+  if (card.reviewStatus === 'rejected') {
+    return { status: 'blocked', reason: 'Reviewer blocked this card for the current demo session.' };
+  }
+
+  if (card.sourceRefs.length === 0 || card.sourceGuardStatus !== 'grounded') {
+    return {
+      status: 'blocked',
+      reason: 'Approval cannot override Source Guard. Missing or invalid source references keep this card blocked.',
+    };
+  }
+
+  if (card.riskFlags.some((flag) => flag.severity === 'high')) {
+    return {
+      status: 'needs_review',
+      reason: 'Approval cannot override high-severity Risk Guard. Expert review or source/risk fixes are required before QR publication.',
+    };
+  }
+
+  if (card.reviewStatus !== 'approved') {
+    return { status: 'needs_review', reason: 'Card is held for expert review in this demo session.' };
+  }
+
+  return { status: 'publishable', reason: 'Approved, source-grounded, and clear of high-severity risk flags.' };
+}
+
+function applyLocalReviewGate(cards: GuardedGuideCard[]): GuardedGuideCard[] {
+  return cards.map((card) => {
+    const localGate = localPublishGateForReview(card);
+
+    return {
+      ...card,
+      publishGateStatus: localGate.status,
+      publishGateReason: localGate.reason,
+    };
+  });
+}
+
 export function TraceCueDashboard({
   generationMeta: initialGenerationMeta,
   guardedCards: initialGuardedCards,
@@ -110,6 +192,7 @@ export function TraceCueDashboard({
   const [currentGenerationMeta, setCurrentGenerationMeta] = useState(initialGenerationMeta);
   const [currentGuardedCards, setCurrentGuardedCards] = useState(initialGuardedCards);
   const [currentLedger, setCurrentLedger] = useState(initialLedger);
+  const [reviewDecisions, setReviewDecisions] = useState<Record<string, DemoReviewDecision>>({});
   const [isRunningDemo, setIsRunningDemo] = useState(false);
   const publishable = currentGuardedCards.filter((card) => card.publishGateStatus === 'publishable');
   const blocked = currentGuardedCards.filter((card) => card.publishGateStatus === 'blocked');
@@ -136,8 +219,11 @@ export function TraceCueDashboard({
       const tone = notificationTone(payload.generationMeta.mode);
 
       setCurrentGenerationMeta(payload.generationMeta);
-      setCurrentGuardedCards(payload.guardedCards);
-      setCurrentLedger(payload.ledger);
+      const locallyGuardedCards = applyLocalReviewGate(payload.guardedCards);
+
+      setCurrentGuardedCards(locallyGuardedCards);
+      setCurrentLedger(buildProcedureLedger(locallyGuardedCards));
+      setReviewDecisions({});
 
       notifications.show({
         title: tone.title,
@@ -175,6 +261,15 @@ export function TraceCueDashboard({
         publishableStepIds: publishable.map((card) => card.id),
         needsReviewStepIds: needsReview.map((card) => card.id),
         blockedStepIds: blocked.map((card) => card.id),
+        reviewActionsAreSessionOnly: true,
+        approvalsDoNotOverrideSourceOrRiskGuards: true,
+      },
+      reviewSession: {
+        scope: 'demo_local_browser_session',
+        persistentStorage: false,
+        decisions: reviewDecisions,
+        safetyPolicy:
+          'Reviewer approval updates reviewStatus only. Source Guard, high-severity Risk Guard, and explicit blocked decisions still control QR publication.',
       },
       revisionProposal: currentLedger.revisionProposal,
     };
@@ -194,6 +289,41 @@ export function TraceCueDashboard({
       message: 'Downloaded tracecue-ledger-equipment-after-sales-v1.json',
       color: 'green',
       icon: <IconCheck size={16} />,
+    });
+  }
+
+  function applyReviewAction(card: GuardedGuideCard, action: DemoReviewAction) {
+    const updatedReviewStatus = reviewStatusForAction(action);
+    const reviewedCards = currentGuardedCards.map((candidate) =>
+      candidate.id === card.id
+        ? {
+            ...candidate,
+            reviewStatus: updatedReviewStatus,
+          }
+        : candidate,
+    );
+    const nextGuardedCards = applyLocalReviewGate(guardCards(reviewedCards));
+    const nextCard = nextGuardedCards.find((candidate) => candidate.id === card.id);
+    const decision: DemoReviewDecision = {
+      action,
+      label: reviewActionLabels[action],
+      reason: nextCard?.publishGateReason ?? 'Review action applied in the current demo session.',
+      decidedAt: new Date().toISOString(),
+      sessionOnly: true,
+    };
+
+    setCurrentGuardedCards(nextGuardedCards);
+    setCurrentLedger(buildProcedureLedger(nextGuardedCards));
+    setReviewDecisions((previous) => ({
+      ...previous,
+      [card.id]: decision,
+    }));
+
+    notifications.show({
+      title: `${reviewActionLabels[action]} recorded`,
+      message: decision.reason,
+      color: reviewActionColors[action],
+      icon: action === 'approved' ? <IconCheck size={16} /> : undefined,
     });
   }
 
@@ -375,8 +505,12 @@ export function TraceCueDashboard({
               </Tabs.List>
 
               <Tabs.Panel value="cards" pt="md">
-                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                  {currentGuardedCards.map((card) => (
+                <Stack gap="md">
+                  <Alert color="blue" radius="md" title="Session-only reviewer controls">
+                    Review actions update this local demo session and the exported ledger JSON only. Approval does not override Source Guard, high-severity Risk Guard, or an explicit blocked decision.
+                  </Alert>
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    {currentGuardedCards.map((card) => (
                     <Card key={card.id} className="trace-glass" radius="md" p="md">
                       <Stack gap="sm">
                         <Group justify="space-between" align="start">
@@ -417,6 +551,12 @@ export function TraceCueDashboard({
                         </Group>
 
                         <Group gap="xs">
+                          <Badge color={card.reviewStatus === 'approved' ? 'green' : card.reviewStatus === 'rejected' ? 'red' : 'yellow'} variant="light">
+                            Review: {reviewStatusLabels[card.reviewStatus]}
+                          </Badge>
+                          <Badge color={card.sourceGuardStatus === 'grounded' ? 'green' : 'red'} variant="light">
+                            Source: {card.sourceGuardStatus.replace('_', ' ')}
+                          </Badge>
                           {card.riskFlags.length === 0 ? (
                             <Badge color="green" variant="light">No risk flags</Badge>
                           ) : card.riskFlags.map((flag) => (
@@ -425,10 +565,17 @@ export function TraceCueDashboard({
                             </Badge>
                           ))}
                         </Group>
+
+                        <ReviewActions
+                          card={card}
+                          decision={reviewDecisions[card.id]}
+                          onDecision={applyReviewAction}
+                        />
                       </Stack>
                     </Card>
-                  ))}
-                </SimpleGrid>
+                    ))}
+                  </SimpleGrid>
+                </Stack>
               </Tabs.Panel>
 
               <Tabs.Panel value="publish" pt="md">
@@ -438,10 +585,13 @@ export function TraceCueDashboard({
                       <Stack gap={4}>
                         <Text className="trace-kicker" fz="xs" fw={800}>Publish Gate</Text>
                         <Title order={2} fz="xl">Unsupported instructions stop here.</Title>
-                        <Text c="dimmed" maw={720} size="sm">
-                          TraceCue separates source-grounded cards from risky or unsupported text before the QR guide reaches frontline users.
-                        </Text>
-                      </Stack>
+                      <Text c="dimmed" maw={720} size="sm">
+                        TraceCue separates source-grounded cards from risky or unsupported text before the QR guide reaches frontline users.
+                      </Text>
+                      <Text c="dimmed" maw={720} size="sm">
+                        Current review decisions are local to this demo session. Approval never bypasses Source Guard, high-severity Risk Guard, or an explicit blocked decision.
+                      </Text>
+                    </Stack>
                       <ThemeIcon radius="md" variant="filled" color="dark" size="lg">
                         <IconLockCheck size={20} />
                       </ThemeIcon>
@@ -521,7 +671,7 @@ export function TraceCueDashboard({
                           <Text size="sm" c="dimmed" mt="xs">
                             {withheldFromPreview.length === 0
                               ? 'No cards are currently withheld. The preview includes every guarded guide card.'
-                              : `${withheldFromPreview.length} card${withheldFromPreview.length === 1 ? '' : 's'} are withheld until review clears them for frontline use.`}
+                              : `${withheldFromPreview.length} card${withheldFromPreview.length === 1 ? '' : 's'} are withheld until review plus source and safety guards clear them for frontline use.`}
                           </Text>
                           {withheldFromPreview.length > 0 ? (
                             <Stack gap="xs" mt="md">
@@ -696,6 +846,59 @@ function MetricCard({ icon, label, value, tone = 'teal' }: { icon: React.ReactNo
         </ThemeIcon>
       </Group>
     </Card>
+  );
+}
+
+function ReviewActions({
+  card,
+  decision,
+  onDecision,
+}: {
+  card: GuardedGuideCard;
+  decision: DemoReviewDecision | undefined;
+  onDecision: (card: GuardedGuideCard, action: DemoReviewAction) => void;
+}) {
+  const hasHighSeverityRisk = card.riskFlags.some((flag) => flag.severity === 'high');
+  const approvalBlockedByGuard = card.sourceGuardStatus !== 'grounded' || card.sourceRefs.length === 0 || hasHighSeverityRisk;
+
+  return (
+    <Paper p="sm" radius="md" className="trace-subtle-panel">
+      <Stack gap="xs">
+        <Group justify="space-between" gap="xs" align="start">
+          <Stack gap={2}>
+            <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Review action</Text>
+            <Text size="sm" c="dimmed">
+              Session-only decision; approval cannot override source or safety guards.
+            </Text>
+          </Stack>
+          {decision ? (
+            <Badge color={reviewActionColors[decision.action]} variant="filled">
+              {decision.label}
+            </Badge>
+          ) : (
+            <Badge color="gray" variant="light">No action</Badge>
+          )}
+        </Group>
+
+        <Group gap="xs">
+          <Button size="xs" radius="md" color="green" variant="light" onClick={() => onDecision(card, 'approved')}>
+            Approved
+          </Button>
+          <Button size="xs" radius="md" color="yellow" variant="light" onClick={() => onDecision(card, 'needs_expert_review')}>
+            Needs expert review
+          </Button>
+          <Button size="xs" radius="md" color="red" variant="light" onClick={() => onDecision(card, 'blocked')}>
+            Blocked
+          </Button>
+        </Group>
+
+        {approvalBlockedByGuard ? (
+          <Text size="xs" c="dimmed">
+            Approval is recorded as review intent, but this card remains withheld while Source Guard is not grounded or high-severity risk flags remain.
+          </Text>
+        ) : null}
+      </Stack>
+    </Paper>
   );
 }
 
