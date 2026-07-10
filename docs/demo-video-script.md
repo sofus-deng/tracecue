@@ -1,227 +1,162 @@
-# Demo video script and screenshot checklist
+# TraceCue Equipment After-sales QR Guide demo video script
 
-TraceCue Agent is being submitted as a public hackathon demo for the Qwen Cloud Global AI Hackathon.
+## Purpose
+
+This document is the recording script for the new TraceCue submission package. It positions TraceCue as the public WorkCue Open / Qwen Cloud competition edition and technical showcase version of WorkCue.
+
+The video should feel like a prize-focused hackathon pitch, not a slow product tutorial. It must show why TraceCue is more than a QR guide generator: it is an agent pipeline that uses Qwen generation, source traceability, safety controls, human review, Publish Gate decisions, ProcedureLedger proof, QR Preview, and exportable artifacts.
+
+## Target duration
+
+Target length: **2 minutes 30 seconds to 2 minutes 55 seconds**.
+
+Hard rule: keep the final cut under 3 minutes.
+
+## Track fit
 
 Recommended track: **Track 4 — Autopilot Agent**.
 
-The main video should be about three minutes and should focus on the product promise:
+TraceCue fits because it automates a real operational workflow: turning scattered equipment after-sales source notes into reviewable frontline QR guide cards, then stopping unsupported or risky instructions before publication.
 
-> Every generated procedure guide card must either show its source trail or be blocked / marked for review before publishing.
+## Core positioning
 
-Keep the recording public-safe. Do not show private repositories, API keys, `.env.local`, terminal history containing secrets, internal WorkCue strategy, customer data, pricing, sales playbooks, or private roadmap material.
+TraceCue is the public, safe competition edition of WorkCue. It demonstrates the core agent pipeline for turning messy equipment after-sales notes into QR-ready frontline guides: Qwen generates, Source Guard traces evidence, humans review risk, Publish Gate blocks unsafe cards, and ProcedureLedger records the proof.
 
-## Submission video goals
+## One-line value proposition
 
-The video should prove four things quickly:
+TraceCue turns public-safe synthetic equipment after-sales notes into QR-ready guide cards, proves where each instruction came from, and withholds unsupported or risky steps before they reach frontline users.
 
-1. TraceCue turns source notes into procedure guide cards.
-2. Every guide card is tied to source chunks or stopped by the Publish Gate.
-3. Qwen live generation is integrated safely behind deterministic fallback.
-4. The demo is inspectable, replayable, and suitable for small-team operational workflows.
+## Recording prerequisites
 
-## Suggested recording setup
+- Use a clean browser profile or private window.
+- Open only the TraceCue app, the public repository README if needed, and optional Alibaba Cloud deployment proof.
+- Use a readable desktop viewport such as `1440 x 900` or `1512 x 982`.
+- Disable notifications and hide bookmarks or browser extensions that may reveal private data.
+- Confirm the initial page load shows deterministic standby unless a controlled smoke test intentionally enables another state.
+- Trigger Qwen live generation only through the explicit `Run Qwen pass` button.
+- Show `qwen_live` and model metadata only if a safe configured environment is available.
+- If free quota is exhausted, present `qwen_quota_paused` / `Free quota exhausted` as a safety state that avoids billable usage.
+- Do not show `.env.local`, API keys, cloud account identifiers, private terminal history, real customer data, private prompts, internal prompt chains, or private WorkCue material.
 
-Use a clean browser window with only these tabs open:
+## Shot-by-shot script
 
-1. Local or deployed TraceCue app.
-2. GitHub repository README.
-3. Optional: Alibaba Cloud deployment proof page or clip if ready.
+| Time | Shot | Narration intent | Visual proof |
+|---|---|---|---|
+| 0:00-0:20 | Problem hook | Frontline QR guides cannot contain unsupported AI-generated instructions. | Show scattered synthetic after-sales sources: maintenance rules, warranty boundaries, safety limits, and support escalation notes. |
+| 0:20-0:40 | TraceCue positioning | TraceCue is the public WorkCue Open / Qwen Cloud competition edition using public-safe synthetic equipment samples. | Show hero, WorkCue Open badge, Equipment After-sales QR Guide label, source coverage, and generation badge. |
+| 0:40-1:10 | Run Qwen pass | Start from deterministic standby, then click `Run Qwen pass` in a safe configured environment if available. | Show standby first, button click, `qwen_live` badge and model metadata if available. Reserve this shot even if fallback is used. |
+| 1:10-1:35 | Source traceability | Every instruction must prove where it came from. | Show guide cards with refs such as `filter-replacement#03`, `fault-triage#02`, `safety-limits#01`, `warranty-boundaries#01`, or `support-escalation#01`. |
+| 1:35-1:55 | Human review and risk controls | Source Guard and Risk Guard catch missing evidence and safety, warranty, escalation, unsupported repair, or service-authority risks. | Show guard badges and session-only review actions. Explain approval cannot bypass missing evidence or high-severity risk. |
+| 1:55-2:15 | Publish Gate | Publishable, needs review, and blocked cards are separated before publication. | Show all three Publish Gate columns and explain withheld cards do not ship to the QR guide. |
+| 2:15-2:35 | QR Preview | Frontline users see only allowed cards. | Show mobile-style QR Preview, included/held/blocked counts, and withheld notice. |
+| 2:35-2:50 | ProcedureLedger and exports | TraceCue records generation, evidence, review, risk, publish status, feedback, revision proposal, and exports proof. | Show ProcedureLedger, ledger JSON export, and guide Markdown export buttons or downloaded artifacts. |
+| 2:50-2:58 | Closing | Tie Qwen Cloud, Alibaba Cloud deployment notes, public repo, and equipment after-sales value together. | End on Publish Gate or QR Preview with proof trail visible. |
 
-Suggested app URL for local recording:
+## Narration script
 
-```text
-http://localhost:3000
-```
+Use this as the primary voiceover. Trim minor wording live if needed, but keep the pacing punchy.
 
-Suggested browser size:
+**0:00-0:20 — Problem hook**
 
-```text
-1440 x 900 or 1512 x 982
-```
+> Equipment vendors and after-sales teams already have the information: maintenance notes, filter replacement steps, fault triage rules, warranty boundaries, safety limits, and support escalation notes. The hard part is turning that messy source material into a QR guide a frontline user can trust. A normal AI generator can produce polished instructions, but a frontline QR guide cannot contain unsupported repair steps, blurred warranty authority, or unsafe advice.
 
-Use a readable zoom level. Avoid showing personal bookmarks, browser extensions with private data, or local filesystem paths that are not needed for the demo.
+**0:20-0:40 — TraceCue positioning**
 
-## Three-minute demo script
+> TraceCue is the public, safe competition edition of WorkCue. It demonstrates the core agent pipeline for turning messy equipment after-sales notes into QR-ready frontline guides: Qwen generates, Source Guard traces evidence, humans review risk, Publish Gate blocks unsafe cards, and ProcedureLedger records the proof. This public demo uses only synthetic equipment after-sales samples and is built for the Qwen Cloud hackathon.
 
-### 0:00–0:20 — Opening problem
+**0:40-1:10 — Run Qwen pass**
 
-**Screen:** TraceCue homepage hero.
+> On page load, TraceCue starts in deterministic standby. That is intentional: refreshes, crawlers, health checks, and passive visits should not create Qwen usage. When a safe configured environment is available, I click `Run Qwen pass` to trigger one explicit Qwen generation request. If live proof is available, show the `qwen_live` state and model metadata here. If quota is exhausted, TraceCue shows `Free quota exhausted` as a paused safety state rather than silently moving into billable usage.
 
-**Narration:**
+**1:10-1:35 — Source traceability**
 
-> Small teams often have scattered handoff notes, support policies, meeting excerpts, and checklists. A normal AI document generator can turn those into text, but it may also publish unsupported or risky instructions. TraceCue Agent is a source-grounded procedure guide autopilot: every guide card must prove where it came from, or it is held for review before publishing.
+> Qwen is not just writing a guide; every card must carry a source trail. These cards reference synthetic source chunks like filter replacement, fault triage, safety limits, warranty boundaries, and support escalation. If a guide card cannot prove where an instruction came from, Source Guard marks it for review or blocks it.
 
-**Visual cue:** Hover or point to the hero, source coverage, and generation badge.
+**1:35-1:55 — Human review and risk controls**
 
-### 0:20–0:45 — Synthetic input pack
+> Risk Guard checks for safety, warranty, escalation, unsupported repair, and service-authority risks. Human review actions are demo-local: a reviewer can approve, request expert review, or block a card, but approval cannot override missing evidence or high-severity risk controls.
 
-**Screen:** Input pack panel.
+**1:55-2:15 — Publish Gate**
 
-**Narration:**
+> The Publish Gate is where the agent becomes useful for frontline operations. Cards are separated into publishable, needs review, and blocked. Unsupported or risky cards are withheld before publication, so the QR guide does not become a blind copy of AI text.
 
-> This public demo uses only synthetic markdown samples. The input pack simulates a client handoff scenario: handoff notes, a support FAQ, a delivery checklist, a meeting transcript excerpt, and a support policy draft. These are parsed into source documents and source chunks.
+**2:15-2:35 — QR Preview**
 
-**Visual cue:** Expand one or two source documents. Show chunk-based provenance without showing any private data.
+> The QR Preview shows what a frontline user would see after scanning an equipment guide link. Only cards cleared by the Publish Gate appear in this mobile-style preview. Review-only and blocked cards stay out of the frontline artifact.
 
-### 0:45–1:20 — Guide cards and source trail
+**2:35-2:50 — ProcedureLedger and exports**
 
-**Screen:** Guide cards tab.
+> ProcedureLedger records what happened: generation mode, model evidence, source coverage, risk flags, review state, publish status, feedback, and the revision proposal. The ledger JSON export gives machine-readable proof, and the guide Markdown export gives a readable review or frontline artifact.
 
-**Narration:**
+**2:50-2:58 — Closing**
 
-> TraceCue creates a Client Handoff Guide from the source pack. Each card has a purpose, instructions, a completion check, and source references. The source trail makes the guide inspectable: reviewers can see which source chunk supports each instruction before it becomes client-facing guidance.
+> TraceCue runs as a public WorkCue Open reference slice with Qwen Cloud usage, Alibaba Cloud deployment notes, deterministic standby, and production-oriented safeguards. It is relevant for equipment vendors and after-sales teams that need source-grounded QR guidance. TraceCue is not just generating instructions. It is proving which instructions are safe enough to publish.
 
-**Visual cue:** Show cards with `sourceRefs`, especially `delivery-checklist#01`, `handoff-notes#01`, and `meeting-transcript#01`.
+## On-screen proof checklist
 
-### 1:20–1:55 — Publish Gate and review states
+- [ ] WorkCue Open badge is visible.
+- [ ] Equipment After-sales QR Guide is visible as the active scenario.
+- [ ] Deterministic standby is visible before any Qwen action.
+- [ ] `Run Qwen pass` is clicked only as an explicit user action.
+- [ ] `qwen_live` and model metadata are shown if a safe configured environment is available.
+- [ ] `qwen_quota_paused` / `Free quota exhausted` is described as a safety state if it appears.
+- [ ] Guide cards show source references from the equipment after-sales source pack.
+- [ ] Source Guard and Risk Guard badges are visible.
+- [ ] Review action copy makes clear approval cannot bypass missing evidence or high-severity risk controls.
+- [ ] Publish Gate shows publishable, needs review, and blocked categories.
+- [ ] QR Preview shows only allowed cards and withholds review-only or blocked cards.
+- [ ] ProcedureLedger shows generation state, source snapshot, guard results, review state, publish state, and revision target.
+- [ ] Export ledger JSON is shown or referenced as the machine-readable proof artifact.
+- [ ] Export guide Markdown is shown or referenced as the readable review/frontline artifact.
 
-**Screen:** Publish Gate tab.
+## Visual capture checklist
 
-**Narration:**
+- [ ] Clean desktop browser viewport, preferably `1440 x 900` or `1512 x 982`.
+- [ ] No private bookmarks, account menus, notifications, local secrets, or personal tabs visible.
+- [ ] Source input pack shows only synthetic equipment after-sales documents.
+- [ ] Guide cards remain readable with source refs visible.
+- [ ] Publish Gate columns are legible in one shot.
+- [ ] QR Preview phone frame fits on screen.
+- [ ] Export buttons are visible: `Export ledger` and `Export guide Markdown`.
+- [ ] If downloaded artifacts are opened, inspect them first and show no secrets.
+- [ ] Optional deployment proof shows only public-safe Alibaba Cloud deployment evidence and no credentials.
 
-> The Publish Gate separates cards into publishable, needs review, and blocked states. Cards with risk language or pending review do not silently ship. Cards with no source reference are blocked. This is the core safety loop: source grounding, risk detection, human review, and explicit publish status.
+## Qwen live proof note
 
-**Visual cue:** Show the three Publish Gate columns and explain why blocked / review-required states matter.
+The strongest recording includes a safe configured run where `Run Qwen pass` produces `qwen_live` and visible model metadata. Show this only when credentials are server-side and safe.
 
-### 1:55–2:20 — ProcedureLedger and replayability
+If live Qwen is unavailable during recording, do not fake it. Keep the deterministic standby shot, reserve a brief live-proof slot, and state that the live path is available through explicit action when configured. If `Free quota exhausted` appears, explain it as `qwen_quota_paused`: TraceCue pauses live generation to avoid billable usage when free quota is exhausted.
 
-**Screen:** ProcedureLedger panel.
+## Export proof note
 
-**Narration:**
+The ledger JSON export should be described as machine-readable proof. It should include generation metadata, ProcedureLedger, source documents, source chunks, guarded guide cards, Publish Gate summary, review session data, feedback, and revision proposal.
 
-> TraceCue records the workflow into a ProcedureLedger. The ledger captures source coverage, missing-source steps, risk flags, review summary, publish status, feedback count, and a revision proposal. This makes the guide workflow replayable instead of being a one-time AI text output.
+The guide Markdown export should be described as a readable artifact for review or frontline distribution after gate clearance. It should show publishable steps, source references, withheld-card notes, generation metadata, and no secrets.
 
-**Visual cue:** Show the timeline and revision target.
+## Public-safety reminders
 
-### 2:20–2:40 — Qwen integration behind fallback
+- Use English narration for the Devpost/submission audience.
+- Keep all samples synthetic and generic.
+- Do not show real customer data, private equipment-owner data, or customer names.
+- Do not show private WorkCue strategy, pricing, sales playbooks, engine-vault material, private prompts, internal prompt chains, secrets, or `.env.local` contents.
+- Do not claim TraceCue is a complete production SaaS product.
+- Say production-oriented safeguards or production-readiness signals, not complete production readiness.
+- Make clear this public slice does not include auth, billing, database persistence, real customer data, QR image upload or decoding, PDF OCR, or multi-tenant SaaS behavior.
+- Do not imply Qwen runs automatically on page load.
+- Do not imply deterministic standby is a hidden live-model success path; it is the safe replay path.
 
-**Screen:** Generation badge and README runtime config section if useful.
+## Submission readiness notes
 
-**Narration:**
+- The active scenario is Equipment After-sales QR Guide, not Client Handoff.
+- The first 30 seconds must answer what TraceCue is, why it matters, why it is more than a QR guide generator, and how it uses Qwen Cloud in an agent pipeline.
+- Keep the story centered on Qwen generation, source traceability, human review, Publish Gate, ProcedureLedger, QR Preview, ledger JSON export, and guide Markdown export.
+- Mention Alibaba Cloud deployment notes and runtime safeguards as production-oriented signals, not as proof of a complete SaaS platform.
+- Keep the final line strong and specific: TraceCue is not just generating instructions. It is proving which instructions are safe enough to publish.
 
-> Qwen live generation is integrated server-side, but the demo remains stable without credentials. By default, it uses deterministic fallback cards. When `QWEN_LIVE_GENERATION=true` and a server-side Qwen or DashScope API key is configured, TraceCue can ask Qwen to generate cards from the same source chunks. Invalid or unavailable model responses fall back safely.
+## Optional backup plan if Qwen live is unavailable during recording
 
-**Visual cue:** Show the generation badge. If live Qwen is enabled and working, show `Generation: Qwen live`; otherwise show `Generation: deterministic fallback` and explain that this is intentional for reproducible judging.
+Use this fallback narration if the environment cannot safely show `qwen_live`:
 
-### 2:40–2:55 — JSON export
+> This recording is using deterministic standby so page loads, refreshes, crawlers, and health checks do not create Qwen usage. The live Qwen path is intentionally behind the explicit `Run Qwen pass` action and records its generation mode and model in ProcedureLedger when configured. If the configured free quota is exhausted, TraceCue enters `qwen_quota_paused` and shows `Free quota exhausted` instead of silently creating billable usage. The rest of the agent pipeline still demonstrates the safety loop: Source Guard, Risk Guard, human review, Publish Gate, QR Preview, and exportable proof.
 
-**Screen:** Export ledger JSON button.
-
-**Narration:**
-
-> Finally, the ledger can be exported as JSON, including generation metadata, source documents, source chunks, guarded guide cards, and the Publish Gate summary. This gives reviewers and developers a concrete artifact to inspect.
-
-**Visual cue:** Click export and briefly show the downloaded JSON if it does not reveal local private paths.
-
-### 2:55–3:05 — Closing
-
-**Screen:** Hero or Publish Gate.
-
-**Narration:**
-
-> TraceCue Agent shows how an autopilot agent can support real business procedures without skipping evidence or human review. It is a focused open-source reference implementation under WorkCue Open, built for the Qwen Cloud Autopilot Agent track.
-
-## Optional shorter version
-
-Use this if the final recording must be tighter:
-
-> TraceCue Agent turns synthetic handoff notes, policies, checklists, and meeting excerpts into source-grounded procedure guide cards. Each card carries source references, passes through Source Guard and Risk Guard, and is then classified by the Publish Gate as publishable, needs review, or blocked. The ProcedureLedger records source coverage, risk flags, review state, publish state, and a revision proposal. Qwen live generation is available server-side, but deterministic fallback keeps the public demo stable without credentials. The exported ledger JSON makes the workflow replayable and inspectable.
-
-## Screenshot checklist
-
-Capture these screenshots for README polish, Devpost submission, and final QA.
-
-### Product screenshots
-
-1. **Hero and source coverage**
-   - Path: `http://localhost:3000`
-   - Must show: TraceCue title, WorkCue Open badge, generation status badge, source coverage ring.
-
-2. **Input pack**
-   - Must show: synthetic source documents and at least one expanded source excerpt.
-   - Must not show: real customer data or private documents.
-
-3. **Guide cards with sourceRefs**
-   - Must show: at least two guide cards with visible source references.
-   - Prefer cards that show `handoff-notes#01`, `meeting-transcript#01`, or `support-faq#01`.
-
-4. **Publish Gate**
-   - Must show: Publishable, Needs Review, and Blocked columns.
-   - Must show: a blocked or review-required card so the safety mechanism is visible.
-
-5. **ProcedureLedger**
-   - Must show: source snapshot, guard results, review state, publish state, and revision target.
-
-6. **Exported ledger JSON**
-   - Must show: `generationMeta`, `procedureLedger`, and `publishGateSummary`.
-   - Must not show: API keys, `.env.local`, or local secrets.
-
-### Repository / documentation screenshots
-
-7. **GitHub README top section**
-   - Must show: product positioning and current demo scope.
-
-8. **Demo data and public repo boundary section**
-   - Must show: synthetic data statement and private-material exclusions.
-
-9. **Alibaba Cloud deployment notes**
-   - Must show: runtime environment variables with empty API key placeholders only.
-
-10. **Work items status**
-    - Must show: T001 through T008 done after this task is complete.
-
-## Recording checklist
-
-Before recording:
-
-- Pull latest `main`.
-- Run `pnpm install` if dependencies changed.
-- Run `pnpm typecheck` and `pnpm build` if time allows.
-- Start the app with `pnpm dev` or run production preview with `pnpm build && pnpm start`.
-- Close private browser tabs and local files.
-- Disable notifications.
-- Confirm no API key is visible anywhere.
-
-During recording:
-
-- Keep the story focused on source trail, ProcedureLedger, Publish Gate, and fallback-safe Qwen integration.
-- Do not spend time explaining future SaaS features.
-- Do not show internal WorkCue planning.
-- Do not over-emphasize pricing, customers, or commercial strategy.
-- Keep the pace clear enough for judges to understand the system in one viewing.
-
-After recording:
-
-- Upload the main demo video publicly to YouTube, Vimeo, or Facebook Video.
-- Keep the main demo around three minutes.
-- Prepare a separate Alibaba Cloud deployment proof clip if required by the hackathon submission form.
-- Verify the Devpost project text links to the public GitHub repo.
-- Verify the public repo includes an open-source license before final submission.
-
-## Devpost submission reminders
-
-The submission should include:
-
-- Public code repository URL.
-- Open-source license visible in the repo.
-- Architecture diagram.
-- Main public demo video, about three minutes.
-- Separate proof of Alibaba Cloud deployment if requested in the submission form.
-- Text description of features and functionality.
-- Track selection: **Track 4 — Autopilot Agent**.
-
-## What not to say in the video
-
-Avoid claims that are not yet implemented:
-
-- Do not claim TraceCue is a complete SaaS product.
-- Do not claim production authentication, billing, database persistence, PDF upload, or multi-tenant support.
-- Do not claim real customer deployment.
-- Do not claim Qwen is always required for the demo to work.
-- Do not mention private WorkCue strategy or internal roadmap.
-
-## Final demo message
-
-Use this as the concise ending line:
-
-> TraceCue Agent is not just generating a guide. It is proving whether each instruction is grounded enough to publish.
+If using this backup, keep the video under 3 minutes by shortening the source traceability and export sections by a few seconds each.
