@@ -46,7 +46,7 @@ Core promise:
 | NT013 | done | P0 | Refresh demo video script | Demo video script presents TraceCue as the public WorkCue Open competition edition and focuses on Qwen generation, source traceability, human review, Publish Gate, ProcedureLedger, QR Preview, and exports in under 3 minutes |
 | NT014 | done | P0 | Prepare Devpost submission copy | Devpost text explains the Track 4 fit, Qwen Cloud usage, technical architecture, problem value, impact, deployment proof, and public-safe WorkCue relationship |
 | NT015 | done | P0 | Create architecture diagram asset | Submission includes a clear architecture diagram showing frontend, Next.js backend, Qwen Cloud API, Source Guard, Risk Guard, ProcedureLedger, Publish Gate, QR Preview, and exports |
-| NT016 | todo | P0 | Capture Qwen live proof and export proof | Submission evidence includes Run Qwen pass, qwen_live/model metadata when safely configured, source refs, Publish Gate, QR Preview, ledger JSON export, and Markdown guide export |
+| NT016 | in_progress | P0 | Capture Qwen live proof and export proof | Submission evidence includes Run Qwen pass, qwen_live/model metadata when safely configured, source refs, Publish Gate, QR Preview, ledger JSON export, and Markdown guide export |
 | NT017 | todo | P0 | Final submission package review | Final review confirms public repo, OSI license, working deployment, video link, architecture diagram, Devpost copy, eligibility, and no secrets |
 
 ## Current Priority
