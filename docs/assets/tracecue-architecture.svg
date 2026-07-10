@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">TraceCue Agent Architecture</title>
+  <desc id="desc">Public WorkCue Open and Qwen Cloud reference architecture for source-grounded equipment after-sales QR guides.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .panel { fill: #ffffff; stroke: #cdd7e5; stroke-width: 2; }
+      .panel-soft { fill: #f9fbfd; stroke: #d8e2ee; stroke-width: 1.5; }
+      .node-source { fill: #edf7f4; stroke: #58a998; stroke-width: 2; }
+      .node-app { fill: #eef4ff; stroke: #5e7fbf; stroke-width: 2; }
+      .node-qwen { fill: #fff5e8; stroke: #d48b30; stroke-width: 2; }
+      .node-standby { fill: #f3f1fb; stroke: #8d78c4; stroke-width: 2; }
+      .node-guard { fill: #fff9e8; stroke: #c59b20; stroke-width: 2; }
+      .node-risk { fill: #fff1f0; stroke: #c46a5c; stroke-width: 2; }
+      .node-review { fill: #f7f7f7; stroke: #7b8494; stroke-width: 2; }
+      .node-ledger { fill: #ecf8ff; stroke: #3a8fb7; stroke-width: 2; }
+      .node-gate { fill: #effaf0; stroke: #4c9b55; stroke-width: 2; }
+      .node-output { fill: #ffffff; stroke: #5f6f86; stroke-width: 2; }
+      .withheld { fill: #fff7f7; stroke: #c75146; stroke-width: 2; stroke-dasharray: 8 6; }
+      .arrow { fill: none; stroke: #34445a; stroke-width: 3; marker-end: url(#arrowHead); }
+      .arrow-soft { fill: none; stroke: #667891; stroke-width: 2.4; marker-end: url(#arrowHeadSoft); }
+      .arrow-qwen { fill: none; stroke: #b97018; stroke-width: 3; marker-end: url(#arrowHeadQwen); }
+      .arrow-block { fill: none; stroke: #c75146; stroke-width: 3; marker-end: url(#arrowHeadBlock); stroke-dasharray: 9 7; }
+      .title { fill: #162238; font-family: Arial, Helvetica, sans-serif; font-size: 42px; font-weight: 800; }
+      .subtitle { fill: #536276; font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-weight: 500; }
+      .section { fill: #506176; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 1px; }
+      .node-title { fill: #172236; font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-weight: 800; }
+      .node-title-small { fill: #172236; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 800; }
+      .node-text { fill: #41516a; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 500; }
+      .node-text-small { fill: #41516a; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; }
+      .label { fill: #253247; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; }
+      .pill { fill: #e9eef6; stroke: #c7d1df; stroke-width: 1; }
+      .pill-text { fill: #36465f; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; }
+      .banner { fill: #142033; }
+      .banner-text { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; }
+    </style>
+    <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#34445a" />
+    </marker>
+    <marker id="arrowHeadSoft" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#667891" />
+    </marker>
+    <marker id="arrowHeadQwen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#b97018" />
+    </marker>
+    <marker id="arrowHeadBlock" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#c75146" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="900" />
+  <rect class="panel" x="34" y="34" width="1532" height="832" rx="28" />
+
+  <text class="title" x="74" y="92">TraceCue Agent Architecture</text>
+  <text class="subtitle" x="74" y="126">Public WorkCue Open / Qwen Cloud reference slice for source-grounded equipment after-sales QR guides</text>
+
+  <text class="section" x="78" y="172">SOURCE PACK</text>
+  <text class="section" x="314" y="172">SOURCE PARSER</text>
+  <text class="section" x="564" y="172">GENERATION</text>
+  <text class="section" x="754" y="172">GUARDS + REVIEW</text>
+  <text class="section" x="1100" y="172">PUBLISH DECISION</text>
+  <text class="section" x="1300" y="172">OUTPUTS</text>
+
+  <rect class="node-source" x="74" y="198" width="214" height="286" rx="18" />
+  <text class="node-title" x="94" y="232">Public-safe</text>
+  <text class="node-title" x="94" y="256">synthetic source pack</text>
+  <text class="node-text" x="94" y="292">maintenance notes</text>
+  <text class="node-text" x="94" y="318">filter replacement</text>
+  <text class="node-text" x="94" y="344">fault triage</text>
+  <text class="node-text" x="94" y="370">safety limits</text>
+  <text class="node-text" x="94" y="396">warranty boundaries</text>
+  <text class="node-text" x="94" y="422">support escalation</text>
+  <rect class="pill" x="94" y="444" width="154" height="24" rx="12" />
+  <text class="pill-text" x="108" y="461">synthetic data only</text>
+
+  <rect class="node-source" x="330" y="230" width="204" height="190" rx="18" />
+  <text class="node-title" x="352" y="264">Source parser</text>
+  <text class="node-text" x="352" y="302">source documents</text>
+  <text class="node-text" x="352" y="328">source chunks</text>
+  <text class="node-text" x="352" y="354">chunk IDs</text>
+  <text class="node-text" x="352" y="380">evidence labels</text>
+
+  <rect class="node-app" x="552" y="206" width="228" height="144" rx="18" />
+  <text class="node-title-small" x="574" y="236">Next.js app on</text>
+  <text class="node-title-small" x="574" y="258">Alibaba Cloud</text>
+  <text class="node-text" x="574" y="286">frontend dashboard</text>
+  <text class="node-text" x="574" y="310">explicit Run Qwen pass</text>
+  <text class="node-text" x="574" y="334">server-side API route</text>
+
+  <rect class="node-qwen" x="552" y="382" width="228" height="146" rx="18" />
+  <text class="node-title-small" x="574" y="414">Qwen Cloud API</text>
+  <text class="node-text" x="574" y="442">guide-card generation</text>
+  <text class="node-text" x="574" y="466">model chain</text>
+  <text class="node-text" x="574" y="490">qwen_quota_paused</text>
+  <text class="node-text" x="574" y="512">safety state</text>
+
+  <rect class="node-standby" x="552" y="570" width="228" height="126" rx="18" />
+  <text class="node-title-small" x="574" y="602">Deterministic</text>
+  <text class="node-title-small" x="574" y="624">standby path</text>
+  <text class="node-text" x="574" y="654">safe replay</text>
+  <text class="node-text" x="574" y="678">no passive page-load</text>
+  <text class="node-text" x="574" y="702">model usage</text>
+
+  <rect class="node-guard" x="838" y="230" width="204" height="116" rx="18" />
+  <text class="node-title-small" x="860" y="264">Source Guard</text>
+  <text class="node-text" x="860" y="294">valid sourceRefs</text>
+  <text class="node-text" x="860" y="318">required</text>
+
+  <rect class="node-risk" x="838" y="384" width="204" height="164" rx="18" />
+  <text class="node-title-small" x="860" y="418">Risk Guard</text>
+  <text class="node-text" x="860" y="448">safety</text>
+  <text class="node-text" x="860" y="472">warranty</text>
+  <text class="node-text" x="860" y="496">escalation</text>
+  <text class="node-text" x="860" y="520">unsupported repair</text>
+  <text class="node-text" x="860" y="544">service authority</text>
+
+  <rect class="node-review" x="838" y="586" width="204" height="142" rx="18" />
+  <text class="node-title-small" x="860" y="620">Human review</text>
+  <text class="node-text" x="860" y="650">approved</text>
+  <text class="node-text" x="860" y="674">needs expert review</text>
+  <text class="node-text" x="860" y="698">blocked</text>
+  <text class="node-text" x="860" y="722">demo-local decisions</text>
+
+  <rect class="node-ledger" x="1080" y="328" width="204" height="218" rx="18" />
+  <text class="node-title-small" x="1102" y="362">ProcedureLedger</text>
+  <text class="node-text" x="1102" y="392">generation mode</text>
+  <text class="node-text" x="1102" y="416">model evidence</text>
+  <text class="node-text" x="1102" y="440">source coverage</text>
+  <text class="node-text" x="1102" y="464">guard results</text>
+  <text class="node-text" x="1102" y="488">review state</text>
+  <text class="node-text" x="1102" y="512">publish state</text>
+
+  <rect class="node-gate" x="1080" y="600" width="204" height="128" rx="18" />
+  <text class="node-title-small" x="1102" y="634">Publish Gate</text>
+  <text class="node-text" x="1102" y="664">publishable</text>
+  <text class="node-text" x="1102" y="688">needs review</text>
+  <text class="node-text" x="1102" y="712">blocked</text>
+
+  <rect class="node-output" x="1320" y="210" width="204" height="82" rx="16" />
+  <text class="node-title-small" x="1340" y="246">Dashboard</text>
+  <text class="node-text-small" x="1340" y="270">evidence workbench</text>
+
+  <rect class="node-output" x="1320" y="324" width="204" height="92" rx="16" />
+  <text class="node-title-small" x="1340" y="360">QR Preview</text>
+  <text class="node-text-small" x="1340" y="384">publishable cards only</text>
+  <text class="node-text-small" x="1340" y="404">frontline mobile view</text>
+
+  <rect class="node-output" x="1320" y="448" width="204" height="82" rx="16" />
+  <text class="node-title-small" x="1340" y="484">Ledger JSON export</text>
+  <text class="node-text-small" x="1340" y="508">machine-readable proof</text>
+
+  <rect class="node-output" x="1320" y="562" width="204" height="82" rx="16" />
+  <text class="node-title-small" x="1340" y="598">Guide Markdown</text>
+  <text class="node-text-small" x="1340" y="622">readable export</text>
+
+  <rect class="withheld" x="1320" y="688" width="204" height="84" rx="16" />
+  <text class="node-title-small" x="1340" y="724">Withheld before QR</text>
+  <text class="node-text-small" x="1340" y="748">needs-review cards</text>
+  <text class="node-text-small" x="1340" y="766">blocked cards</text>
+
+  <path class="arrow" d="M288 342 L330 342" />
+  <path class="arrow-soft" d="M534 312 C556 310 562 300 552 286" />
+  <path class="arrow-soft" d="M534 350 C566 390 568 520 552 626" />
+  <path class="arrow-qwen" d="M666 350 L666 382" />
+  <path class="arrow-qwen" d="M780 455 C816 455 816 290 838 290" />
+  <path class="arrow-soft" d="M780 634 C816 632 816 316 838 316" />
+  <path class="arrow" d="M940 346 L940 384" />
+  <path class="arrow" d="M940 548 L940 586" />
+  <path class="arrow" d="M1042 657 C1064 657 1064 438 1080 438" />
+  <path class="arrow" d="M1182 546 L1182 600" />
+  <path class="arrow" d="M1284 664 C1302 664 1302 252 1320 252" />
+  <path class="arrow" d="M1284 664 C1308 664 1308 372 1320 372" />
+  <path class="arrow" d="M1284 664 C1308 664 1308 490 1320 490" />
+  <path class="arrow" d="M1284 664 C1308 664 1308 604 1320 604" />
+  <path class="arrow-block" d="M1198 728 C1256 784 1286 744 1320 732" />
+
+  <text class="label" x="580" y="370">explicit user action only</text>
+  <text class="label" x="695" y="242">server-side call</text>
+  <text class="label" x="700" y="574">safety replay path</text>
+  <text class="label" x="1212" y="764">review-only / blocked cards do not enter QR Preview</text>
+
+  <rect class="panel-soft" x="74" y="752" width="1210" height="54" rx="16" />
+  <text class="node-text" x="94" y="784">Qwen live generation is optional and is triggered through the explicit Run Qwen pass control. Page load uses deterministic standby by default.</text>
+
+  <rect class="banner" x="74" y="824" width="1450" height="34" rx="17" />
+  <text class="banner-text" x="100" y="847">Public-safe slice: synthetic data only, server-side Qwen credentials, no secrets, no real customer data.</text>
+</svg>
