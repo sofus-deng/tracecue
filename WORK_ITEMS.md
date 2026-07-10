@@ -43,15 +43,20 @@ Core promise:
 | NT010 | done | P1 | Add visual QA checklist | README or docs include desktop/mobile screenshots to capture before submission |
 | NT011 | done | P1 | Update public README for new TraceCue | README explains WorkCue Open, new after-sales scenario, Qwen model chain, cost guard, and deployment proof |
 | NT012 | done | P1 | Final new TraceCue validation | `pnpm typecheck`, `pnpm build`, `pnpm lint`, browser check, export check, Qwen manual-run check |
+| NT013 | todo | P0 | Refresh demo video script | Demo video script presents TraceCue as the public WorkCue Open competition edition and focuses on Qwen generation, source traceability, human review, Publish Gate, ProcedureLedger, QR Preview, and exports in under 3 minutes |
+| NT014 | todo | P0 | Prepare Devpost submission copy | Devpost text explains the Track 4 fit, Qwen Cloud usage, technical architecture, problem value, impact, deployment proof, and public-safe WorkCue relationship |
+| NT015 | todo | P0 | Create architecture diagram asset | Submission includes a clear architecture diagram showing frontend, Next.js backend, Qwen Cloud API, Source Guard, Risk Guard, ProcedureLedger, Publish Gate, QR Preview, and exports |
+| NT016 | todo | P0 | Capture Qwen live proof and export proof | Submission evidence includes Run Qwen pass, qwen_live/model metadata when safely configured, source refs, Publish Gate, QR Preview, ledger JSON export, and Markdown guide export |
+| NT017 | todo | P0 | Final submission package review | Final review confirms public repo, OSI license, working deployment, video link, architecture diagram, Devpost copy, eligibility, and no secrets |
 
 ## Current Priority
 
-Start with `NT003` and `NT004` together only if the user asks for an implementation pass.
+NT001 through NT012 are complete. The next priority is preparing the public hackathon submission package for prizes and customer-facing technical review.
 
 Recommended next coding task:
 
 ```text
-Replace the old Client Handoff scenario with a synthetic Equipment After-sales QR Guide scenario, including source documents, chunks, demo copy, and export names.
+Refresh the demo video script so it presents TraceCue as the public WorkCue Open competition edition and demonstrates Qwen generation, source traceability, human review, Publish Gate, ProcedureLedger, QR Preview, and exports in under 3 minutes.
 ```
 
 ## Automation Tasks
