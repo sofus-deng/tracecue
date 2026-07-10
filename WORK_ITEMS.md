@@ -41,7 +41,7 @@ Core promise:
 | NT008 | done | P1 | Add exportable guide artifact | Export Markdown or HTML guide in addition to ProcedureLedger JSON |
 | NT009 | done | P1 | Improve quota-state messaging | UI clearly distinguishes Qwen live, fallback, unconfigured, failed, and quota paused states |
 | NT010 | done | P1 | Add visual QA checklist | README or docs include desktop/mobile screenshots to capture before submission |
-| NT011 | todo | P1 | Update public README for new TraceCue | README explains WorkCue Open, new after-sales scenario, Qwen model chain, cost guard, and deployment proof |
+| NT011 | done | P1 | Update public README for new TraceCue | README explains WorkCue Open, new after-sales scenario, Qwen model chain, cost guard, and deployment proof |
 | NT012 | todo | P1 | Final new TraceCue validation | `pnpm typecheck`, `pnpm build`, `pnpm lint`, browser check, export check, Qwen manual-run check |
 
 ## Current Priority
