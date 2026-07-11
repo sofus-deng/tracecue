@@ -47,16 +47,26 @@ Core promise:
 | NT014 | done | P0 | Prepare Devpost submission copy | Devpost text explains the Track 4 fit, Qwen Cloud usage, technical architecture, problem value, impact, deployment proof, and public-safe WorkCue relationship |
 | NT015 | done | P0 | Create architecture diagram asset | Submission includes a clear architecture diagram showing frontend, Next.js backend, Qwen Cloud API, Source Guard, Risk Guard, ProcedureLedger, Publish Gate, QR Preview, and exports |
 | NT016 | in_progress | P0 | Capture Qwen live proof and export proof | Submission evidence includes Run Qwen pass, qwen_live/model metadata when safely configured, source refs, Publish Gate, QR Preview, ledger JSON export, and Markdown guide export |
+| NT016A | todo | P0 | Simplify customer-facing UX and information hierarchy | Default workspace is task-first for SMB operators: Overview shows status and next action; Review uses a focused queue or master-detail layout; Publish Gate stays inspectable; Customer Guide presents the QR/mobile outcome; Sources, ProcedureLedger, generation metadata, and exports move into Evidence; standby never implies a live model was used; export copy explicitly identifies JSON/evidence ledger; desktop and mobile visual QA pass without changing Qwen runtime, guard, or export semantics |
 | NT017 | todo | P0 | Final submission package review | Final review confirms public repo, OSI license, working deployment, video link, architecture diagram, Devpost copy, eligibility, and no secrets |
 
 ## Current Priority
 
-NT001 through NT015 are complete. The next priority is capturing the public hackathon submission evidence for prizes and customer-facing technical review.
+NT001 through NT015 are complete. NT016 evidence preparation is in progress, but final capture should pause until the customer-facing information hierarchy is simplified.
 
 Recommended next coding task:
 
 ```text
-Capture Qwen live proof and export proof, including Run Qwen pass, qwen_live/model metadata when safely configured, source refs, Publish Gate, QR Preview, ledger JSON export, and Markdown guide export.
+Implement NT016A: make the default workspace task-first for SMB operators, move technical detail into an Evidence tab, clarify standby and export wording, and complete desktop/mobile visual QA before resuming NT016 evidence capture.
+```
+
+Recommended sequence:
+
+```text
+NT016 preparation
+-> NT016A customer-first UX refinement
+-> resume and complete NT016 evidence capture
+-> NT017 final submission review
 ```
 
 ## Automation Tasks
