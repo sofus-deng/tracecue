@@ -53,6 +53,8 @@ The old Client Handoff content can remain only as legacy reference until replace
 - Preserve the model-chain quota strategy.
 - If free quota is exhausted, show a paused state instead of silently pretending generation succeeded.
 - Deterministic fallback is allowed as a safety path, but UI and exports must clearly state when fallback was used.
+- In deterministic standby or fallback modes, do not present the configured model as a model that actually generated the visible cards.
+- Only `qwen_live` may present the current model as the model used for this generation result.
 - Never commit `.env.local` or API keys.
 
 ## UI Direction
@@ -68,6 +70,31 @@ Design target:
 - readable under demo pressure
 - strong visual hierarchy without decorative AI gradients
 - clear proof trail from source to publish decision
+- customer-first and task-first for SMB operators
+- progressive disclosure: show the next decision and customer outcome first, reveal technical evidence on demand
+
+Default information hierarchy:
+
+```text
+Overview
+Review
+Publish Gate
+Customer Guide
+Evidence
+```
+
+UI requirements for the customer-first workspace:
+
+- `Overview` should answer current status, next action, ready / review / blocked counts, and the customer-facing outcome in one viewport.
+- `Review` should use a focused queue or master-detail layout so one decision is primary at a time.
+- `Publish Gate` should summarize publishable, needs-review, and blocked cards without repeating every full card.
+- `Customer Guide` should present the mobile / QR outcome in customer language.
+- `Evidence` should contain sources, source chunks, ProcedureLedger, generation metadata, detailed risk and review proof, revision proposal, and exports.
+- Do not create more than two levels of disclosure or nested navigation.
+- Use compact summaries such as verified source counts and risk counts, with exact refs available on demand.
+- Reserve strong borders, warning color, and visual weight for selected, blocked, high-risk, or decision-critical content.
+- Disabled or planned features should not occupy primary interaction space.
+- Export labels should make artifact purpose and format explicit, such as `Export guide Markdown` and `Export evidence ledger JSON`.
 
 Avoid:
 
@@ -76,6 +103,8 @@ Avoid:
 - decorative prompt boxes
 - marketing-only hero sections
 - dark glassmorphism that hides the actual product
+- showing every technical detail and every full guide card at once
+- making engineering terminology the primary label when clearer customer language exists
 
 ## Work Items
 
@@ -119,6 +148,15 @@ For Qwen runtime changes, also verify:
 - manual run can reach `qwen_live` when quota and config are valid
 - quota exhaustion reaches `qwen_quota_paused`
 - exported ledger records the generation mode and model
+
+For customer-first UI changes, also verify:
+
+- desktop and mobile layouts keep the next action visible
+- Review focuses on one decision at a time
+- detailed evidence remains available without dominating the default workspace
+- standby does not imply that a live model was used
+- Publish Gate and Customer Guide remain easy to inspect
+- export labels and downloaded artifacts remain accurate
 
 ## Completion Report
 
